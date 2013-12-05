@@ -7,3 +7,4 @@ Author: Noam Ross <noam.ross@gmail.com>
 Maintainer: Noam Ross <noam.ross@gmail.com>
 Description: Manuscript and code for a paper on the interaction of age structure and repeated infections.
 License: CC-BY
+Depends: noamtools
