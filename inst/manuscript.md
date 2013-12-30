@@ -23,6 +23,8 @@ Introduction
     - Sudden Oak Death
     - What else? Chestnut blight, 
     
+    
+@Adler1992 showed that the third moment of the distribution was a function of the mean and mean/variance ratio, but only *asympotically*
 ## Models
 
 -   A version of @Anderson1978 ODEs with age structure
