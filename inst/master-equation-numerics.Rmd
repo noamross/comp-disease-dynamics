@@ -77,6 +77,7 @@ require(data.table)
 require(grid)
 require(gridExtra)
 require(animation)
+require(noamtools)
 ```
    
 ```{r setupfns}
@@ -263,7 +264,7 @@ to encounter susceptible individuals in the population due to spatial clustering
 
 @Brown2004, examine the role of space in the spread of disease in a plant population.  Also using an $SI$ model, they give the following expression for the force of infection:
 
-$$\lamda = \beta (1 + \mathcal{\bar C}_{SI}) SI$$
+$$\lambda = \beta (1 + \mathcal{\bar C}_{SI}) SI$$
 
 $\mathcal{\bar C}_SI$ is the population-weighted, dispersal-kernel-scaled spatial covariance between $S$ and $I$ populations. That is, it is a clustering index.  When $\mathcal{\bar C}_{SI} < 0$, spatial clustering reduces infection rates, in the same manner as the power law above.
 

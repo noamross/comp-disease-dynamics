@@ -14,14 +14,14 @@ Introduction
 ============
 
 -   Review of age structure in disease model (limited, as this is large)
-    -   Recent Caswell paper on matrix models
-
+    -   Recent Caswell paper on matrix models [@Klepac2010]
 -   Review of multiple-infection literature (less limited)
+    -   [@Anderson1978]
 -   Review of overlap of the two (only a couple of papers)
-
+    -   [@Pugliese2004; @Pugliese2008]
 -   Diseases modeled as SI for which multiple infection may be appropriate.
     - Sudden Oak Death
-    - What else?
+    - What else? Chestnut blight, 
     
 ## Models
 

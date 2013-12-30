@@ -141,6 +141,7 @@ I plot them:
 ```{r}
 require(deSolve)
 require(reshape2)
+require(noamtools)
 out <- as.data.frame(lsoda(y=init, times=1:100, func=model, parms=parms))
 df <- as.data.frame(out)
 names(df)[1] <- "Time"
