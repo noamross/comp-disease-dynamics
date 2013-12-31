@@ -139,11 +139,11 @@ weighted.moments <- function(counts, weights) {
   mean.val <- weighted.mean(counts, weights)
   sum.weights = sum(weights)
   variance <- sum(weights * ((counts - mean.val)^2))/sum.weights
-  skew <- sum(weights * ((counts - mean.val)/sqrt(variance))^3)/sum.weights
-  kurt <- sum(weights * ((counts - mean.val)/sqrt(variance))^4)/sum.weights - 3
+  skew <- sum(weights * ((counts - mean.val))^3)/sum.weights
+  kurt <- sum(weights * ((counts - mean.val))^4)/sum.weights - 3
   VarMeanRatio <- variance/mean.val
-  SumVar <- mean.val + VarMeanRatio
-  return(c(mean.val, variance, skew, kurt, VarMeanRatio, SumVar))
+  SumVars <- mean.val + VarMeanRatio
+  return(c(mean.val, variance, skew, kurt, VarMeanRatio, SumVars))
 }
 
 moments <- as.data.frame(
@@ -167,16 +167,16 @@ moments2 <- dcast(moments, time + Species + SizeClass ~ Moment,
                   value.var="Value")
 ggplot(moments2, aes(x=Mean, y=VarMeanRatio, col=SizeClass)) + 
   geom_path(arrow=arrow(angle=20, type="closed"))
-d
+
 
 ggplot(moments2, aes(x=SumVars, y=Skewness, col=SizeClass)) + 
-  geom_path(arrow=arrow(angle=20, type="closed")) + ylim(-5,5)
+  geom_path(arrow=arrow(angle=20, type="closed")) 
 
 ## ----animplot, warning=FALSE, fig.show='animate', interval=0.1, cache=TRUE, dependson=c('setparms', 'master_odes', 'run')----
-lineplot <- ggplot(sumd, aes(x=time, y=H, col=as.factor(SizeClass))) + geom_line(lwd=1) + theme_nr + theme(legend.position=c(0.75,0.75)) + ylim(-0.5,10.5) + xlim(0,25) + ylab('Host Population') + scale_color_discrete(labels=c("Small Trees", "Big Trees"))
+lineplot <- ggplot(sumd, aes(x=time, y=H, col=as.factor(SizeClass))) + geom_line(lwd=1) + theme_nr() + theme(legend.position=c(0.75,0.75)) + ylim(-0.5,max(sumd$H)) + xlim(0,times.max) + ylab('Host Population') + scale_color_discrete(labels=c("Small Trees", "Big Trees"))
 pp <- function(timer) {
   lineplot2 <- lineplot + geom_point(data=subset(sumd, time==timer), cex=6) + geom_vline(aes(xintercept = time), data=subset(sumd, time==timer))
-  distplot <- ggplot(subset(d,time==timer), aes(x=Infected, y=NormInfected, fill=as.factor(SizeClass))) + geom_area(stat="identity", position="identity") + theme_nr + theme(legend.position="none") + xlim(-1,251) + ylab("Proportion of Population") + xlab("Number of Infections")
+  distplot <- ggplot(subset(d,time==timer), aes(x=Infected, y=NormInfected, fill=as.factor(SizeClass))) + geom_area(stat="identity", position="identity") + theme_nr() + theme(legend.position="none") + xlim(-1,50) + ylab("Proportion of Population") + xlab("Number of Infections")
   grid.arrange(lineplot2, distplot)
   }
 
@@ -185,7 +185,7 @@ pp <- function(timer) {
 #}
 
 require(manipulate)
-manipulate(pp(x), x=slider(0,25, step=0.1))
+manipulate(pp(x), x=slider(0,times.max, step=times.by))
 
 ## ----infperind, warning=FALSE--------------------------------------------
 ggplot(sumd, aes(x=time, y=InfPerInd, col=as.factor(SizeClass))) + geom_line(lwd=1) + theme_nr + ylab("Infections per Individual") + scale_color_discrete(labels=c("Small Trees", "Big Trees"))
