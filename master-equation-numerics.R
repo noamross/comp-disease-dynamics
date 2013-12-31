@@ -38,9 +38,9 @@ parm_list <- list(
 
 adler_parms <- list( 
   n_stages=2,
-  n_parasites=25,
-  f=c(1.5, 1.5),
-  g=c(0.1, 0),
+  n_parasites=150,
+  f=c(15, 15),
+  g=c(1, 0),
   d=c(0.2, 0.2),
   alpha=c(1,1),
   lamda=c(3, 3),
@@ -64,8 +64,8 @@ init <- create_state_vector(parm_list$n_stages, parm_list$n_parasites)
 init[1:4] <- c(J_ss, A_ss*0.9999, 0, A_ss*.00001)
 
 times.min <- 0
-times.max <- 10
-times.by <- 0.1 
+times.max <- 7.5
+times.by <- 0.01
 times <- seq(times.min, times.max, by=times.by)
 
 master_odes <- function(t, y, parm_vector) {
@@ -81,7 +81,7 @@ master_odes <- function(t, y, parm_vector) {
             (1 - sum(c(0, omega)*rowSums(H))/K)) - 
             H[2,2] * (d[1] + g[1] + Beta[1]*Lamda) + H[2,3]*mu[1]
   cases <- as.matrix(expand.grid(j=stages[-1],i=0:n_parasites))
-  derivs <- aaply(cases[-1,], 1, function(case) {
+  derivs <- apply(cases[-1,], 1, function(case) {
                     j <- case[1]
                     i <- case[2]
                     deriv <- (H[j+1,i+1] - H[j+1,i+2])*Beta[j]*Lamda + 
@@ -176,10 +176,10 @@ ggplot(moments2, aes(x=SumVars, y=Skewness, col=SizeClass)) +
   geom_path(arrow=arrow(angle=20, type="closed")) 
 
 ## ----animplot, warning=FALSE, fig.show='animate', interval=0.1, cache=TRUE, dependson=c('setparms', 'master_odes', 'run')----
-lineplot <- ggplot(sumd, aes(x=time, y=H, col=as.factor(SizeClass))) + geom_line(lwd=1) + theme_nr() + theme(legend.position=c(0.75,0.75)) + ylim(-0.5,max(sumd$H)) + xlim(0,times.max) + ylab('Host Population') + scale_color_discrete(labels=c("Small Trees", "Big Trees"))
+lineplot <- ggplot(sumd, aes(x=time, y=H, col=as.factor(SizeClass))) + geom_line(lwd=1) + geom_line(mapping=aes(y=InfPerInd), lty=2) + theme_nr() + theme(legend.position=c(0.75,0.75)) + ylim(-0.5,max(c(sumd$H, sumd$InfPerInd))) + xlim(0,times.max) + ylab('Host Population') + scale_color_discrete(labels=c("Small Trees", "Big Trees"))
 pp <- function(timer) {
   lineplot2 <- lineplot + geom_point(data=subset(sumd, time==timer), cex=6) + geom_vline(aes(xintercept = time), data=subset(sumd, time==timer))
-  distplot <- ggplot(subset(d,time==timer), aes(x=Infected, y=NormInfected, fill=as.factor(SizeClass))) + geom_area(stat="identity", position="identity") + theme_nr() + theme(legend.position="none") + xlim(-1,50) + ylab("Proportion of Population") + xlab("Number of Infections")
+  distplot <- ggplot(subset(d,time==timer), aes(x=Infected, y=NormInfected, fill=as.factor(SizeClass))) + geom_area(stat="identity", position="identity", alpha=0.5) + theme_nr() + theme(legend.position="none") + xlim(-1,50) + ylab("Proportion of Population") + xlab("Number of Infections")
   grid.arrange(lineplot2, distplot)
   }
 
