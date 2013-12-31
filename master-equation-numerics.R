@@ -69,7 +69,19 @@ times.by <- 0.01
 times <- seq(times.min, times.max, by=times.by)
 
 master_odes <- function(t, y, parm_vector) {
-  list2env(relist(parm_vector), environment())
+  n_stages = parm_vector[1]
+  n_parasites = parm_vector[2]
+  f = parm_vector[3:(2+n_stages)]
+  g = parm_vector[(3 + n_stages):(2 + 2*n_stages)]
+  d = parm_vector[(3 + 2*n_stages):(2 + 3*n_stages)]
+  alpha = parm_vector[(3 + 3*n_stages):(2 + 4*n_stages)]
+  lamda = parm_vector[(3 + 4*n_stages):(2 + 5*n_stages)]
+  Beta = parm_vector[(3 + 5*n_stages):(2 + 6*n_stages)]
+  mu = parm_vector[(3 + 6*n_stages):(2 + 7*n_stages)]
+  xi = parm_vector[(3 + 7*n_stages):(2 + 8*n_stages)]
+  omega = parm_vector[(3 + 8*n_stages):(2 + 9*n_stages)]
+  K = parm_vector[3 + 9*n_stages]
+  
   stages <- c(0, 1:n_stages)
   parasites <- c(0, 0:n_parasites, 0)
   H <- rbind(rep(0, n_parasites + 3), 
@@ -77,25 +89,23 @@ master_odes <- function(t, y, parm_vector) {
                    matrix(y, n_stages, n_parasites+1),
                    rep(0, n_stages)))
   Lamda <- sum(c(0,lamda)*colSums(t(H)*parasites))
-  dH_1_0 <- (sum(c(0, f)*rowSums(H*outer(c(0, xi), parasites, "^")))*
-            (1 - sum(c(0, omega)*rowSums(H))/K)) - 
-            H[2,2] * (d[1] + g[1] + Beta[1]*Lamda) + H[2,3]*mu[1]
-  cases <- as.matrix(expand.grid(j=stages[-1],i=0:n_parasites))
-  derivs <- apply(cases[-1,], 1, function(case) {
-                    j <- case[1]
-                    i <- case[2]
-                    deriv <- (H[j+1,i+1] - H[j+1,i+2])*Beta[j]*Lamda + 
-                         H[j,i+2]*c(0, g)[j] - 
-                         H[j+1,i+2]*(d[j] + g[j] + i*(mu[j] + alpha[j])) +
-                         H[j+1,i+3]*(i+1)*mu[j]
-                   # browser()
-                    return(deriv)
-                    })
-  derivatives <- c(dH_1_0, derivs)
-  names(derivatives) <- paste0("dH_", cases[,"j"], "_", cases[,"i"])
+  derivs <- rep(NA, n_stages*(n_parasites + 1))
+
+  for (i in 0:n_parasites) {
+    for (j in 1:n_stages) {
+      derivs[i*n_stages + j] <- (H[j+1,i+1] - H[j+1,i+2])*Beta[j]*Lamda + 
+                                H[j,i+2]*c(0, g)[j] - 
+                                H[j+1,i+2]*(d[j] + g[j] + i*(mu[j] + alpha[j])) +
+                                H[j+1,i+3]*(i+1)*mu[j]
+    }
+  }
+  derivs[1] <- (sum(c(0, f)*rowSums(H*outer(c(0, xi), parasites, "^")))*
+               (1 - sum(c(0, omega)*rowSums(H))/K)) - 
+               H[2,2] * (d[1] + g[1] + Beta[1]*Lamda) + H[2,3]*mu[1]
+#  names(derivatives) <- paste0("dH_", cases[,"j"], "_", cases[,"i"])
 #  if(prog==1) setTxtProgressBar(BAR, t)
-  if(prog==1) cat("\r", t, " ", round(100*t/times.max, 1), "%    \r")
-  return(list(derivatives))
+#  if(prog==1) cat("\r", t, " ", round(100*t/times.max, 1), "%    \r")
+  return(list(derivs))
 }
 
 
