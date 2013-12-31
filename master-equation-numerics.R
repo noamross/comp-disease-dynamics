@@ -104,7 +104,7 @@ master_odes <- function(t, y, parm_vector) {
                H[2,2] * (d[1] + g[1] + Beta[1]*Lamda) + H[2,3]*mu[1]
 #  names(derivatives) <- paste0("dH_", cases[,"j"], "_", cases[,"i"])
 #  if(prog==1) setTxtProgressBar(BAR, t)
-#  if(prog==1) cat("\r", t, " ", round(100*t/times.max, 1), "%    \r")
+  if(prog==1) cat("\r", t, " ", round(100*t/times.max, 1), "%    \r")
   return(list(derivs))
 }
 
@@ -200,7 +200,36 @@ pp <- function(timer) {
 require(manipulate)
 manipulate(pp(x), x=slider(0,times.max, step=times.by))
 
-## ----infperind, warning=FALSE--------------------------------------------
+library(bbmle)
+
+KLD <- function(par, dat) {
+  negbin <- dnbinom(x=0:(length(dat)-1), mu=par[1], size=par[2])
+  KLD <- sum(dat*log(dat/negbin))
+  return(KLD)
+}
+
+NegBinFit <- function(dat) {
+  dat = dat/sum(dat)
+  bins <- 0:(length(dat) - 1)
+  mu.start = weighted.mean(bins, dat)
+  size.start = mu.start^2 / (max(0.01, sum(dat * (bins - mu.start)^2) - mu.start))
+  size.start = ifelse(size.start==0, 1, size.start)
+  mu.start = ifelse(mu.start==0, 0.00001, mu.start)
+  return(optim(c(mu=mu.start, size=size.start), KLD, dat=dat))
+}
+
+fitf <- ddply(d, .(time, Species, SizeClass), function(z) {
+  v <- z$Population
+  v <- v[1:(min(which(v < 1e-300)[1] - 1, length(v), na.rm=TRUE))]
+  opt <- NegBinFit(v)
+  return(data.frame(mu=opt$par[1], k = opt$par[2], KLD = opt$value))
+})
+
+fitm <- melt(fitf, id.vars=c("time", "Species", "SizeClass"))
+ggplot(fitm, aes(x=time, y=value, col=factor(SizeClass))) + geom_line() + facet_wrap(~variable, ncol=1, scales="free_y")
+
+NegBinFit(v)
+str## ----infperind, warning=FALSE--------------------------------------------
 ggplot(sumd, aes(x=time, y=InfPerInd, col=as.factor(SizeClass))) + geom_line(lwd=1) + theme_nr + ylab("Infections per Individual") + scale_color_discrete(labels=c("Small Trees", "Big Trees"))
 
 
