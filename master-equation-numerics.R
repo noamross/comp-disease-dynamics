@@ -28,7 +28,7 @@ parm_list <- list(
   d=c(0.005, 0.005),
   alpha=c(0.05,0.05),
   lamda=c(0.3, 0.3),
-  beta = c(1, 1),
+  Beta = c(1, 1),
   mu = c(0.00, 0.00),
   xi = c(1, 1),
   omega = c(1,1),
@@ -38,13 +38,13 @@ parm_list <- list(
 
 adler_parms <- list( 
   n_stages=2,
-  n_parasites=250,
+  n_parasites=25,
   f=c(1.5, 1.5),
   g=c(0.1, 0),
   d=c(0.2, 0.2),
   alpha=c(1,1),
   lamda=c(3, 3),
-  beta = c(1, 1),
+  Beta = c(1, 1),
   mu = c(1, 1),
   xi = c(1, 1),
   omega = c(1,1),
@@ -65,28 +65,31 @@ init[1:4] <- c(J_ss, A_ss*0.9999, 0, A_ss*.00001)
 
 times.min <- 0
 times.max <- 10
-times.by <- 0.005 
+times.by <- 0.1 
 times <- seq(times.min, times.max, by=times.by)
 
 master_odes <- function(t, y, parm_vector) {
   list2env(relist(parm_vector), environment())
-  stages <- 1:n_stages
-  parasites <- 0:n_parasites
-  H <- matrix(y, n_stages, n_parasites+1)
-  Lamda <- sum(lamda*colSums(t(H)*parasites))
-  dH_1_0 <- (sum(f*rowSums(H*outer(xi, parasites, "^")))*
-            (1 - sum(omega*rowSums(H))/K)) - 
-            H[1,1] * (d[1] + g[1] + beta[1]*Lamda) + H[1,2]*mu[1]
-  cases <- as.matrix(expand.grid(j=stages,i=parasites))
+  stages <- c(0, 1:n_stages)
+  parasites <- c(0, 0:n_parasites, 0)
+  H <- rbind(rep(0, n_parasites + 3), 
+             cbind(rep(0, n_stages), 
+                   matrix(y, n_stages, n_parasites+1),
+                   rep(0, n_stages)))
+  Lamda <- sum(c(0,lamda)*colSums(t(H)*parasites))
+  dH_1_0 <- (sum(c(0, f)*rowSums(H*outer(c(0, xi), parasites, "^")))*
+            (1 - sum(c(0, omega)*rowSums(H))/K)) - 
+            H[2,2] * (d[1] + g[1] + Beta[1]*Lamda) + H[2,3]*mu[1]
+  cases <- as.matrix(expand.grid(j=stages[-1],i=0:n_parasites))
   derivs <- aaply(cases[-1,], 1, function(case) {
                     j <- case[1]
                     i <- case[2]
-                    d <- ifelse(i==0, 0, H[j,i]*beta[j]*Lamda) + 
-                         ifelse(j==1, 0, H[j-1,i+1]*g[j-1]) - 
-                         H[j,i+1]*(d[j] + g[j] + i*(mu[j] + alpha[j])) +
-                         ifelse(i==n_parasites, 0, H[j,i+2]*(i+1)*mu[j] - 
-                                                   H[j,i+1]*beta[j]*Lamda)
-                    return(d)
+                    deriv <- (H[j+1,i+1] - H[j+1,i+2])*Beta[j]*Lamda + 
+                         H[j,i+2]*c(0, g)[j] - 
+                         H[j+1,i+2]*(d[j] + g[j] + i*(mu[j] + alpha[j])) +
+                         H[j+1,i+3]*(i+1)*mu[j]
+                   # browser()
+                    return(deriv)
                     })
   derivatives <- c(dH_1_0, derivs)
   names(derivatives) <- paste0("dH_", cases[,"j"], "_", cases[,"i"])
@@ -99,9 +102,9 @@ master_odes <- function(t, y, parm_vector) {
 ## ----run, cache=TRUE, dependson=c('setparms', 'model-function')----------
 #if(parm_list$prog==1) {BAR <- txtTimerBar(times.max)}
 
-#Rprof("out.prof", line.profiling=TRUE)
+Rprof("out.prof", line.profiling=TRUE)
 out <- lsoda(init, times, master_odes, parm_vector)
-#Rprof(NULL)
+Rprof(NULL)
 
 
 ## ----orgdata, results='hide'---------------------------------------------
@@ -132,7 +135,7 @@ sumd <- ddply(sumd, .(time, Species), transform,
               )
 
 sumd <- ddply(sumd, .(time, Species, SizeClass), transform,
-              NewInfRate = parm_list$beta[SizeClass] * Lamda)
+              NewInfRate = parm_list$Beta[SizeClass] * Lamda)
 
 require(moments)
 weighted.moments <- function(counts, weights) {
