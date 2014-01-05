@@ -23,7 +23,9 @@ Introduction
     - Sudden Oak Death
     - What else? Chestnut blight, 
     
-    
+
+The transient phase is often of importance, especially in the case of newly invading diseases.
+
 @Adler1992 showed that the third moment of the distribution was a function of the mean and mean/variance ratio, but only *asympotically*
 ## Models
 
