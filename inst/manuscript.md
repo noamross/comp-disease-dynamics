@@ -49,4 +49,13 @@ Introduction
 -   Disease structure can reflect underlying pop structure
 -   What diseases should be represented with multiple infections? What disease
     have age-related patterns that may be due to repreated infections?
+    
+    
+## General Notes
+
+-   Bimodal distributions occur even in the absence of age structure. They occur
+    In the transient due to the arrival of new individuals in the space occupied
+    by the recently killed invididuals.  Total behavior in the face of age
+    divisions with no demographic differences in age strucutre is identical
+-   
 
