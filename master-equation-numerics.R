@@ -9,108 +9,171 @@ require(grid)
 require(gridExtra)
 require(animation)
 require(noamtools)
+require(manipulate)
+require(multicore)
+require(doMC)
+require(foreach)
+
+registerDoMC(cores=5)
 
 parms = list( 
-  n_stages = 2,
+  n_stages = 4,
   n_parasites = 150,
-  f = c(15, 15),
-  g = c(1, 0),
-  d = c(0.2, 0.2),
-  alpha = c(1,1),
-  lamda = c(3, 3),
-  Beta = c(1, 1),
-  mu = c(1, 1),
-  xi = c(1, 1),
-  omega = c(1,1),
+  f = c(15, 15, 15, 15),
+  g = c(0.1, 0.1, 0.1, 0),
+  d = c(0.2, 0.2, 0.2, 0.2),
+  alpha = c(1, 1, 1, 1),
+  lamda = c(3, 3, 3, 3),
+  Beta = c(1, 1, 1, 1),
+  mu = c(1, 1, 1, 1),
+  xi = c(1, 1, 1, 1),
+  omega = c(1, 1, 1, 1),
   K = 10,
   progress = 0,
   times.min = 0,
   times.max = 2,
   times.by = 0.0025,
   inits = 0,
-  infect_vector = c(0.0001, 0.0001)
-  )
-
-parms2 = list( 
-  n_stages = 1,
-  n_parasites = 150,
-  f = c(15),
-  g = c(0),
-  d = c(0.2),
-  alpha = c(1),
-  lamda = c(3),
-  Beta = c(1),
-  mu = c(1),
-  xi = c(1),
-  omega = c(1),
-  K = 10,
-  progress = 0,
-  times.min = 0,
-  times.max = 2,
-  times.by = 0.0025,
-  inits = 0,
-  infect_vector = c(0.0001)
+  infect_vector = c(0.0001, 0.0001, 0.0001, 0.0001)
 )
 
-require(deSolve)
+parms2 = list( 
+  n_stages = 4,
+  n_parasites = 150,
+  f = c(15, 15, 15, 15),
+  g = c(1, 1, 1, 0),
+  d = c(0.2, 0.2, 0.2, 0.2),
+  alpha = c(1, 1, 1, 1),
+  lamda = c(3, 3, 3, 3),
+  Beta = c(1, 1, 1, 1),
+  mu = c(1, 1, 1, 1),
+  xi = c(1, 1, 1, 1),
+  omega = c(1, 1, 1, 1),
+  K = 10,
+  progress = 0,
+  times.min = 0,
+  times.max = 2,
+  times.by = 0.0025,
+  inits = 0,
+  infect_vector = c(0.0001, 0.0001, 0.0001, 0.0001)
+)
 
-out = run_sodp(parms)
-d = process_sodp(out)
-d = sodp_totals(d)
-stats = sodp_stats(d)
-stats.m = melt(stats, id.vars=c("time", "Species", "SizeClass"))
+parms4 = list( 
+  n_stages = 4,
+  n_parasites = 150,
+  f = c(15, 15, 15, 15),
+  g = c(10, 10, 10, 0),
+  d = c(0.2, 0.2, 0.2, 0.2),
+  alpha = c(1, 1, 1, 1),
+  lamda = c(3, 3, 3, 3),
+  Beta = c(1, 1, 1, 1),
+  mu = c(1, 1, 1, 1),
+  xi = c(1, 1, 1, 1),
+  omega = c(1, 1, 1, 1),
+  K = 10,
+  progress = 0,
+  times.min = 0,
+  times.max = 2,
+  times.by = 0.0025,
+  inits = 0,
+  infect_vector = c(0.0001, 0.0001, 0.0001, 0.0001)
+)
 
-out2 = run_sodp(parms2)
-d2 = process_sodp(out2)
-d2 = sodp_totals(d2)
-stats2 = sodp_stats(d2)
-stats.m2 = melt(stats2, id.vars=c("time", "Species", "SizeClass"))
+parms4a = list( 
+  n_stages = 4,
+  n_parasites = 150,
+  f = c(15, 15, 15, 15),
+  g = c(30, 30, 30, 0),
+  d = c(0.2, 0.2, 0.2, 0.2),
+  alpha = c(1, 1, 1, 1),
+  lamda = c(3, 3, 3, 3),
+  Beta = c(1, 1, 1, 1),
+  mu = c(1, 1, 1, 1),
+  xi = c(1, 1, 1, 1),
+  omega = c(1, 1, 1, 1),
+  K = 10,
+  progress = 0,
+  times.min = 0,
+  times.max = 2,
+  times.by = 0.0025,
+  inits = 0,
+  infect_vector = c(0.0001, 0.0001, 0.0001, 0.0001)
+)
+
+plist <- list(Run1 = parms, Run2 = parms2, Run3 = parms4, Run4 = parms4a)
+
+bigd <- llply(plist, function(pars) {
+  out = run_sodp(pars)
+  d = process_sodp(out)
+  d = sodp_totals(d)
+  return(d)
+}, .parallel=TRUE)
+
+bigstat <- llply(bigd, sodp_stats, .parallel=TRUE)
+bigstat.m <- llply(bigstat, function(z) {
+  z.m <- melt(z, id.vars=c("time", "Species", "SizeClass"))
+  attr(z.m, "parms") <- attr(z, "parms")
+  return(z.m)}, .parallel=TRUE)
+
+bigd <- data.table(ldply(bigd, function(z) z))
+bigstat <- data.table(ldply(bigstat, function(z) z))
+bigstat.m <- data.table(ldply(bigstat.m, function(z) z))
+bigd[, .id:=factor(.id)]
+bigstat[, .id:=factor(.id)]
+bigstat.m[, .id:=factor(.id)]
+bigd[, time:=round_any(time, .0025)]
+bigstat[, time:=round_any(time, .0025)]
+bigstat.m[, time:=round_any(time, .0025)]
 
 
-cc <- rbind(cbind(d, Run=1), cbind(d2, Run=2))
-
-combined <- rbind(cbind(stats, Run=1), cbind(stats2, Run=2))
-combined.m = rbind(cbind(stats.m2, Run=1), cbind(stats.m, Run=2))
-attr(combined, "parms") <- attr(stats, "parms")
-attr(combined.m, "parms") <- attr(stats, "parms.m")
-
-ggplot(subset(combined.m, SizeClass=="Total"), aes(x=time, y=value, col=as.factor(Run))) + 
+ggplot(subset(bigstat.m, SizeClass=="Total"), aes(x=time, y=value, col=.id)) + 
   facet_wrap(~variable, scales="free_y") +
-  geom_line() 
+  geom_line()
 
-manipulate(ggplot(subset(SET, variable==VAR & (TOT | SizeClass != "Total")), 
+manipulate(ggplot(subset(bigstat.m, variable==VAR &
+                                    ((SZ & SizeClass != "Total") |
+                                    (TOT & SizeClass == "Total")) &
+                                    .id == SET), 
                   aes(x=time, y=value, col=SizeClass)) + 
-             geom_line(),
-           VAR=do.call(picker, c(as.list(levels(stats.m$variable)),
-                                 label="Variable")),
+             geom_line() +
+             ylim(0, max(subset(bigstat.m, variable==VAR, value))),
+           VAR=do.call(picker, as.list(levels(bigstat.m$variable))),
            TOT=checkbox(label="Include Totals?"),
-           SET=picker(list(age=stats.m, none=stats.m2)))
+           SZ=checkbox(initial=TRUE, label="Include Others?"),
+           SET=picker(as.list(levels(bigstat.m$.id))))
 
-fits = data.table(ddply(combined, .(time, Species, SizeClass, Run),
+NN <- max(bigd[, Infected])
+fits = data.table(ddply(bigstat, .(time, Species, SizeClass, .id),
               function(z) {
                 data.frame(
-                Infected = 0:attr(combined, "parms")$n_parasites,
-                FitPop = dnbinom(0:attr(combined, "parms")$n_parasites,
+                Infected = 0:NN,
+                FitPop = dnbinom(0:NN,
                                  mu=z$NegBin_mu, size=z$NegBin_k)*z$N)
-              }))
+              }, .parallel=TRUE))
 
-manipulate({set = cc[(SizeClass=="Total") & time==TIME,]
-            set2 = fits[(SizeClass=="Total") & time==TIME,]
-           plot = ggplot(set, aes(x=Infected, y=Population, fill=as.factor(Run)))
+manipulate({set = bigd[((SZ & SizeClass != "Total") |
+                          (TOT & SizeClass == "Total")) & 
+                         abs(time - TIME) < .000001 & .id==RUN,]
+            set2 = fits[((SZ & SizeClass != "Total") |
+                           (TOT & SizeClass == "Total")) &
+                          abs(time - TIME) < .000001 & .id==RUN,]
+           plot = ggplot(set, aes(x=Infected, y=Population, fill=as.factor(SizeClass)))
            if(FIT) {
-             plot = plot + geom_line(mapping=aes(x=Infected, y=FitPop,
-                                                 col=as.factor(Run)),
-                                     data=set2, lty=2, lwd=1.5)
+             plot = plot + geom_line(mapping=aes(x=Infected, y=FitPop),
+                                     data=set2, lty=1, lwd=.75, col="black")
     #           scale_color_manual(values=c("1"="red", "2"="green", "Total"="blue"))
            }
-             plot = plot + geom_area(alpha = 0.5, position="identity") +
+             plot = plot + geom_area(alpha = 0.5, position="identity",
+                                    lwd=0.5) +
    #          scale_fill_manual(values=c("1"="red", "2"="green", "Total"="blue"))
              ggtitle(paste("Time =",TIME))
 
            plot},
-           TIME=slider(min=min(d$time), max=max(d$time), 
+           RUN = picker(as.list(levels(bigd$.id))),
+           TIME=slider(min=min(bigd$time), max=max(bigd$time), 
                        step=0.0025,
                        label="Time Step"),
-           TOT=checkbox(label="Include Totals?"),
+           TOT=checkbox(initial=TRUE, label="Include Totals?"),
+           SZ=checkbox(label="Include Others?"),
            FIT=checkbox(label="Show negative binomial fit?"))
 

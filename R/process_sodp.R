@@ -33,6 +33,7 @@ NegBinFit <- function(dat) {
 }
 
 sodp_stats <- function(processed) {
+  list2env(attr(processed, "parms"), environment())
   stats <- ddply(processed, .(time, Species, SizeClass), summarize,
                  N = sum(Population),
                  P = sum(Population*Infected),
@@ -44,11 +45,40 @@ sodp_stats <- function(processed) {
                  Skew = sum(Infected * ((Population - Mean)^3))/sum(Infected),
                  Kurt = sum(Infected * ((Population - Mean)^4))/sum(Infected) - 3,
                  Var_Mean_Ratio = Var/Mean)
-  fit <- ddply(processed, .(time, Species, SizeClass), function(z) {
-    nbf <- NegBinFit(z$Population)
+  
+  fit = ddply(processed, .(time, Species, SizeClass), function(z) {
+    nbf = NegBinFit(z$Population)
     data.frame(NegBin_mu = nbf$par[1], NegBin_k = nbf$par[2], KLD = nbf$value)
   })
-  stats <- merge(stats, fit)
+  
+  mort1 = ddply(subset(processed, SizeClass != "Total"), .(time, Species, SizeClass), 
+                 function(z) {
+                   ClassMorts = z$Population*(d[as.integer(as.character(z$SizeClass))] +
+                            z$Infected * alpha[as.integer(as.character(z$SizeClass))])
+                   Mort = sum(ClassMorts)/sum(z$Population)
+                   MortInf = sum(ClassMorts[which(z$Infected != 0)])/
+                             sum(z$Population[which(z$Infected != 0)])
+                   data.frame(Mort=Mort, MortInf=MortInf)
+                  })
+  
+  mort2 = ddply(subset(processed, SizeClass != "Total"), .(time, Species), 
+                  function(z) {
+                    ClassMorts = z$Population*(d[as.integer(as.character(z$SizeClass))] +
+                                               z$Infected * alpha[as.integer(as.character(z$SizeClass))])
+                    Mort = sum(ClassMorts)/sum(z$Population)
+                    MortInf = sum(ClassMorts[which(z$Infected != 0)]) /
+                              sum(z$Population[which(z$Infected != 0)])
+                    data.frame(SizeClass=factor("Total"), Mort, MortInf)
+                  })
+  stats = merge(stats, rbind(mort1, mort2))
+  stats = merge(stats, fit)
+  stats = ddply(stats, .(time, Species), transform, 
+                RelMort = c(sum(SizeClass != "Total")*
+                            Mort[SizeClass != "Total"]/
+                            sum(Mort[SizeClass != "Total"]), 1),
+                RelMortInf = c(sum(SizeClass != "Total")*
+                               MortInf[SizeClass != "Total"] / 
+                               sum(MortInf[SizeClass != "Total"]), 1))
   attr(stats, "parms") <- attr(processed, "parms")
   return(stats)
 }
