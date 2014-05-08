@@ -51,6 +51,31 @@ The transient phase is often of importance, especially in the case of newly inva
 -   Disease structure can reflect underlying pop structure
 -   What diseases should be represented with multiple infections? What disease
     have age-related patterns that may be due to repreated infections?
+    
+    
+## General Notes
+
+-   Bimodal distributions occur even in the absence of age structure. They occur
+    In the transient due to the arrival of new individuals in the space occupied
+    by the recently killed invididuals.  Total behavior in the face of age
+    divisions with no demographic differences in age strucutre is identical
+-   Neg. binomial always problematic with new births occurring.  Real
+    distibution as more zero and small values than predicted with negative
+    binomial.
+-   Diseased equilibrium always has lower N, and smaller-individual skewed stage
+    distribution than DFE.
+-   Relative mortality rates diverge during invasion, then converge a little.
+    The degree of shrinkage is greater with low growth rates; with high growth
+    rates, mortality rates don't spread out or bounce back as much.
+-   Equilbrium mortality rates aren't that different across growth rates.
+-   In slow-growing conditions, mortality rate diverge later, because at first
+    very little of the mortality in older plants is from infections while
+    they are younger. 
+-   Also, in slow-growing conditions, mortality in each group will be higher,
+    though since more individuals will be small, overall mortality remains the
+    same across growth rates.
+    
+    
 
 
 Key points: variability in infectious period
