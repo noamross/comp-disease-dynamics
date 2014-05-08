@@ -41,7 +41,7 @@ master_odes <- function(t, y, parm_vector) {
   Lamda <- sum(c(0,lamda)*colSums(t(H)*parasites))
   derivs <- rep(NA, n_stages*(n_parasites + 1))
   
-  for (i in 0:n_parasites) {
+  for (i in 0:(n_parasites)) {
     for (j in 1:n_stages) {
       derivs[i*n_stages + j] <- (H[j+1,i+1] - H[j+1,i+2])*Beta[j]*Lamda + 
         H[j,i+2]*c(0, g)[j] - 
@@ -49,6 +49,7 @@ master_odes <- function(t, y, parm_vector) {
         H[j+1,i+3]*(i+1)*mu[j]
     }
   }
+
   derivs[1] <- (sum(c(0, f)*rowSums(H*outer(c(0, xi), parasites, "^")))*
                   (1 - sum(c(0, omega)*rowSums(H))/K)) - 
     H[2,2] * (d[1] + g[1] + Beta[1]*Lamda) + H[2,3]*mu[1]

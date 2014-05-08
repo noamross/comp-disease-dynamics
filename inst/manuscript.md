@@ -52,3 +52,7 @@ The transient phase is often of importance, especially in the case of newly inva
 -   What diseases should be represented with multiple infections? What disease
     have age-related patterns that may be due to repreated infections?
 
+
+Key points: variability in infectious period
+
+Management implications: Remove the *most* infected trees 

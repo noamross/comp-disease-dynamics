@@ -3,8 +3,8 @@
 process_sodp <- function(sodp) {
   d <- data.table(melt(as.data.frame(sodp), id.vars="time", value.name="Population"))
   newCols <- c("Species", "SizeClass", "Infected") 
-  d[, c(newCols) := as.list(strsplit(as.character(variable), "_")[[1]]), by=variable ]
-  d[, c(newCols) := lapply(.SD, factor), .SDcols=newCols]
+  d[, (newCols) := as.list(strsplit(as.character(variable), "_")[[1]]), by=variable ]
+  d[, (newCols) := lapply(.SD, factor), .SDcols=newCols]
   d[, variable := NULL]
   d[, SizeClass := as.factor(as.character(SizeClass))]
   d[, Infected := as.integer(as.character(Infected))]
@@ -40,10 +40,12 @@ sodp_stats <- function(processed) {
                  I = sum(Population[which(Infected != 0)]),
                  FracInf = I/N,
                  Mean = P/N,
+                 MortInfRate = sum(Infected * Population)/I,
                  Var = sum(Infected * ((Population - Mean)^2))/sum(Infected),
                  Skew = sum(Infected * ((Population - Mean)^3))/sum(Infected),
                  Kurt = sum(Infected * ((Population - Mean)^4))/sum(Infected) - 3,
                  Var_Mean_Ratio = Var/Mean)
+  stats$MortInfRate = stats$MortInfRate * attr(processed, "parms")$alpha
   fit <- ddply(processed, .(time, Species, SizeClass), function(z) {
     nbf <- NegBinFit(z$Population)
     data.frame(NegBin_mu = nbf$par[1], NegBin_k = nbf$par[2], KLD = nbf$value)
