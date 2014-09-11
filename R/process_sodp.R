@@ -1,9 +1,11 @@
+library(R.cache)
 #' @import data.table
 #' @export
-process_sodp <- function(sodp) {
-  d <- data.table(melt(as.data.frame(sodp), id.vars="time", value.name="Population"))
-  newCols <- c("Species", "SizeClass", "Infected") 
-  d[, (newCols) := as.list(strsplit(as.character(variable), "_")[[1]]), by=variable ]
+process_sodp.reg <- function(sodp) {
+  d <-melt(as.data.table(sodp), id.vars="time", value.name="Population")
+  d[, variable := as.character(variable)]
+  newCols <- c("Species", "SizeClass", "Infected")
+  d[, (newCols) := as.list(strsplit(variable, "_")[[1]]), by=variable ]
   d[, (newCols) := lapply(.SD, factor), .SDcols=newCols]
   d[, variable := NULL]
   d[, SizeClass := as.factor(as.character(SizeClass))]
@@ -12,6 +14,8 @@ process_sodp <- function(sodp) {
   attr(d, "parms") <- attr(sodp, "parms")
   return(d)
 }
+
+process_sodp <- addMemoization(process_sodp.reg)
 
 KLD <- function(par, dat) {
   negbin <- dnbinom(x=0:(length(dat)-1), mu=par[1], size=par[2])
@@ -32,7 +36,7 @@ NegBinFit <- function(dat) {
   return(optim(c(mu=mu.start, size=size.start), KLD, dat=dat))
 }
 
-sodp_stats <- function(processed) {
+sodp_stats.reg <- function(processed) {
   stats <- ddply(processed, .(time, Species, SizeClass), summarize,
                  N = sum(Population),
                  P = sum(Population*Infected),
@@ -45,18 +49,22 @@ sodp_stats <- function(processed) {
                  Skew = sum(Infected * ((Population - Mean)^3))/sum(Infected),
                  Kurt = sum(Infected * ((Population - Mean)^4))/sum(Infected) - 3,
                  Var_Mean_Ratio = Var/Mean)
-  stats$MortInfRate = stats$MortInfRate * attr(processed, "parms")$alpha
+  stats$MortInfRate = stats$MortInfRate * c(attr(processed, "parms")$alpha, 0)
+  stats$MortInfRate[stats$SizeClass=="Total"] = daply(subset(stats, SizeClass != "Total"), .(time, Species), function(x) {
+    sum(x$I * x$MortInfRate)/sum(x$I)})
   fit <- ddply(processed, .(time, Species, SizeClass), function(z) {
     nbf <- NegBinFit(z$Population)
     data.frame(NegBin_mu = nbf$par[1], NegBin_k = nbf$par[2], KLD = nbf$value)
   })
+  stats = ddply(stats, .(time, Species), transform, RMortInfRate = MortInfRate/min(MortInfRate))
   stats <- merge(stats, fit)
   attr(stats, "parms") <- attr(processed, "parms")
   return(stats)
 }
 
+sodp_stats <- addMemoization(sodp_stats.reg)
 
-sodp_totals <- function(processed_sodp) {
+sodp_totals.reg <- function(processed_sodp) {
   tot = processed_sodp[, list(SizeClass=factor("Total"),
                                Population=sum(Population)),
                         by="time,Species,Infected"]
@@ -65,3 +73,5 @@ sodp_totals <- function(processed_sodp) {
   attr(tot, "parms") <- attr(processed_sodp, "parms")
   return(tot)
 }
+
+sodp_totals <- addMemoization(sodp_totals.reg)

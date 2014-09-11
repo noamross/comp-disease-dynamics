@@ -1,7 +1,7 @@
 #' Simulate the infinite set of equations
 #' @export
 #' @importFrom deSolve lsoda
-run_sodp <- function(parms) {
+run_sodp.reg <- function(parms) {
   times <- seq(parms$times.min, parms$times.max, by=parms$times.by)
   if(parms$inits==0) {
     inits <- DFE_init(parms)
@@ -13,6 +13,67 @@ run_sodp <- function(parms) {
   attr(out, "parms") <- parms
   return(out)
   }
+
+run_sodp <- addMemoization(run_sodp.reg)
+
+init_derivs.reg <- function(parms, time=0, SI=FALSE) {
+  parms$progress = 0
+  if(parms$inits==0) {
+    inits <- DFE_init(parms)
+  } else {
+    inits <- parms$inits
+  }
+  parm_vector <- unlist(as.relistable(parms))
+  derivs = master_odes(time, inits, parm_vector)[[1]]
+  if(SI) {
+    derivs = c(sum(derivs[1:parms$n_stages]), sum(derivs[(parms$n_stages + 1):length(derivs)]))
+    names(derivs) = c("S", "I")
+  } else {
+  names(derivs) =   paste0("H_",
+                           rep(1:parms$n_stages, parms$n_parasites+1), "_",
+                           rep(0:parms$n_parasites, each=parms$n_stages))
+  }
+  return(derivs)
+}
+
+init_derivs <- addMemoization(init_derivs.reg)
+
+#' @import numDeriv
+init_derivs2.reg <- function(parms, time=0, SI=FALSE) {
+  parms$progress = 0
+  if(parms$inits==0) {
+    inits <- DFE_init(parms)
+  } else {
+    inits <- parms$inits
+  }
+  parm_vector <- unlist(as.relistable(parms))
+  derivs = master_odes(time, inits, parm_vector)[[1]]
+  derivfunc = function(inits) {
+    return(master_odes(t=time, y=inits, parm_vector=parm_vector)[[1]])
+  }
+
+  jac = jacobian(derivfunc, inits, method.args=list(r=6))
+  derivs2 = as.vector(jac %*% derivs)
+  if(SI) {
+    derivs = c(sum(derivs[1:parms$n_stages]), sum(derivs[(parms$n_stages + 1):length(derivs)]))
+    derivs2 = c(sum(derivs2[1:parms$n_stages]), sum(derivs2[(parms$n_stages + 1):length(derivs2)]))
+    
+    names(derivs) = c("S", "I")
+    names(derivs2) = c("S", "I")
+    
+  } else {
+    names(derivs) =   paste0("H_",
+                             rep(1:parms$n_stages, parms$n_parasites+1), "_",
+                             rep(0:parms$n_parasites, each=parms$n_stages))
+    names(derivs2) =   paste0("H_",
+                             rep(1:parms$n_stages, parms$n_parasites+1), "_",
+                             rep(0:parms$n_parasites, each=parms$n_stages))
+  }
+  return(rbind(derivs, derivs2))
+}
+  
+init_derivs2 <- addMemoization(init_derivs2.reg)
+
 
 master_odes <- function(t, y, parm_vector) {
   
@@ -43,10 +104,17 @@ master_odes <- function(t, y, parm_vector) {
   
   for (i in 0:(n_parasites)) {
     for (j in 1:n_stages) {
+      if (i == n_parasites) {
+      derivs[i*n_stages + j] <- (H[j+1,i+1])*Beta[j]*Lamda +           #Infections accumulate in the largest infection class (reflecting boundary) 
+        H[j,i+2]*c(0, g)[j] - 
+        H[j+1,i+2]*(d[j] + g[j] + i*(mu[j] + alpha[j])) +
+        H[j+1,i+3]*(i+1)*mu[j]
+      } else {
       derivs[i*n_stages + j] <- (H[j+1,i+1] - H[j+1,i+2])*Beta[j]*Lamda + 
         H[j,i+2]*c(0, g)[j] - 
         H[j+1,i+2]*(d[j] + g[j] + i*(mu[j] + alpha[j])) +
         H[j+1,i+3]*(i+1)*mu[j]
+      }
     }
   }
 
