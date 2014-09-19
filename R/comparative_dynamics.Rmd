@@ -31,9 +31,9 @@ parms_SI = list(
   xi = c(1, 1),
   omega = c(1,1),
   K = 1,
-  progress = 1,
+  progress = 0,
   times.min = 0,
-  times.max = 100,
+  times.max = 50,
   times.by = 0.1,
   inits = 0,
   infect_vector = c(0.01, 0.01)
@@ -44,6 +44,7 @@ parms_SIV$n_parasites = 2
 
 parms_macro = parms_SI
 parms_macro$n_parasites = 150
+parms_SI$times.by = 0.01
 ```
 
 ```{r setup}
@@ -55,8 +56,8 @@ library(ggplot2)
 library(data.table)
 library(noamtools)
 library(numDeriv)
-source('~/Dropbox/code/age-infects/R/process_sodp.R')
-source('~/Dropbox/code/age-infects/R/run_sodp.R')
+source('R/process_sodp.R')
+source('R/run_sodp.R')
 ```
 
 ```{r runmodels}
@@ -99,35 +100,40 @@ ggplot(stats_macro.m, aes(x=time, y=value, col=SizeClass)) +
 stats = list(SI=stats_SI.m, SIV=stats_SIV.m, macro=stats_macro.m)
 statsall = ldply(stats, function(x) x)
 mortInf = ldply(stats, function(x) subset(x, variable=="MortInfRate"))
-ggplot(mortInf, aes(x = time, y=value, col=.id, linetype=SizeClass)) +
+ggplot(mortInf, aes(x = time, y=value, col=.id, linetype=SizeClass, size=SizeClass)) +
   geom_line() +
   ylim(0, 0.4) +
   ylab("Mortality Rate of Infected Trees") +
   xlab("Time") +
   scale_linetype_manual(labels=c("Juv", "Adult", "Total"), values=c(3,2,1)) +
+<<<<<<< HEAD
   theme_nr +
   theme(text=element_text(family="Lato")) +
   guides(linetype = guide_legend(reverse=TRUE))
 
+=======
+  scale_size_manual(values=c(0.5,0.5, 1.5), guide='none') + 
+  theme_nr +
+  theme(text=element_text(family="Lato")) +
+  guides(linetype = guide_legend(reverse=TRUE))
+>>>>>>> 30628c54b6b22941fc2ff6fa7dd30076b06b3ea5
 ```
 
 ```{r modparms}
-
-mod_SIV = tail(subset(stats_SI.m, variable=="MortInfRate" & SizeClass=="Total"), 1)$value/
-         tail(subset(stats_SIV.m, variable=="MortInfRate" & SizeClass=="Total"), 1)$value
 
 parms_SIVmod = parms_SIV
 
 
 
-aa = optim(par = 0.69, f = function(mod_SIV) {
+aa = optim(par = 1, f = function(mod_SIV) {
   parms_SIVmod$alpha = parms_SIV$alpha*mod_SIV
   parms_SIVmod$lamda = parms_SIV$lamda*mod_SIV
   out_SIVmod = run_sodp(parms_SIVmod)
   SIVmodsf = process_sodp(out_SIVmod)
   SIVmodsf = sodp_totals(SIVmodsf)
   stats_SIVmod = sodp_stats(SIVmodsf)
-  val = tail(subset(stats_SIVmod, SizeClass=="Total"), 1)$MortInfRate
+  val = subset(stats_SIVmod, time==parms_SIVmod$times.max & SizeClass=="Total")$MortInfRate
+  if(interactive()) print(val)
   return((val - parms_SI$alpha[1])^2)
   }, method="Brent", lower=0, upper=2)
 
@@ -152,7 +158,8 @@ bb = optim(par = 0.6118, f = function(mod_macro) {
   macromodsf = process_sodp(out_macromod)
   macromodsf = sodp_totals(macromodsf)
   stats_macromod = sodp_stats(macromodsf)
-  val = tail(subset(stats_macromod, SizeClass=="Total"), 1)$MortInfRate
+  val = subset(stats_macromod, time==parms_macromod$times.max & SizeClass=="Total")$MortInfRate
+  if(interactive()) print(val)
   return((val - parms_SI$alpha[1])^2)
   }, method="Brent", lower=0, upper=2)
 
@@ -236,6 +243,7 @@ aa = optim(par = c(1,1), fn = function(mod_SIV) {
   parms_SIVmod$alpha = parms_SIV$alpha*mod_SIV[1]
   parms_SIVmod$lamda = parms_SIV$lamda*mod_SIV[2]
   val = init_derivs2(parms_SIVmod, SI=TRUE)[,2]
+  if(interactive()) print(val)
   return(sum(((val - SI_Final)/SI_Final)^2))
   })
 
@@ -257,6 +265,7 @@ bb = optim(par = aa$par, f = function(mod_macro) {
   parms_macromod$alpha = parms_macro$alpha*mod_macro[1]
   parms_macromod$lamda = parms_macro$lamda*mod_macro[2]
   val = init_derivs2(parms_macromod, SI=TRUE)[,2]
+  if(interactive()) print(val)
   return(sum(((val - SI_Final)/SI_Final)^2))
   })
 
@@ -300,7 +309,7 @@ ggplot(mortInf, aes(x = time, y=value, col=.id, linetype=SizeClass)) +
 
 stats = list(SI=stats_SI.m, SIV=stats_SIVmod2.m, macro=stats_macromod2.m)
 statsall = ldply(stats, function(x) x)
-mortInf = ldply(stats, function(x) subset(x, variable=="I"))
+mortInf = ldply(stats, function(x) subset(x, variable=="FracInf"))
 ggplot(mortInf, aes(x = time, y=value, col=.id, linetype=SizeClass)) +
   geom_line() +
 #  ylim(0, 0.4) +
@@ -318,15 +327,24 @@ ggplot(mortInf, aes(x = time, y=value, col=.id, linetype=SizeClass)) +
 frac_I = 0.1
 sit = subset(stats_SI, SizeClass=="Total", select=c("time", "FracInf"))
 sit = sit[order(sit$time),]
-timeToFracI = sit$time[min(which(sit$FracInf >= frac_I))]
-SI_Final = init_derivs2(parms_SI, SI=TRUE)[,2]
-
-
+timeToFracI_fn = function(sit, frac_I) {
+  afti = min(which(sit$FracInf >= frac_I), na.rm=TRUE)
+  if(is.na(afti) || afti==Inf) return(max(sit$time))
+  befi = min(which(sit$FracInf >= frac_I)) - 1
+  befx = sit$time[befi]
+  befy = sit$FracInf[befi]
+  aftx = sit$time[afti]
+  afty = sit$FracInf[afti]
+  slope = (afty-befy)/(aftx-befx)
+  return(befx + (frac_I - befy)/slope)
+  }
+timeToFracI = timeToFracI_fn(sit, frac_I)
 parms_SIVmod3 = parms_SIV
+parms_SIVmod3$times.max = 18
+parms_SIVmod3$times.by = 0.01
 
 
-
-aa = optim(par = 1, fn = function(mod_SIV) {
+cc = optim(par = 1, fn = function(mod_SIV) {
   parms_SIVmod3$alpha = parms_SIV$alpha*mod_SIV
   parms_SIVmod3$lamda = parms_SIV$lamda*mod_SIV
   out_SIVmod = run_sodp(parms_SIVmod3)
@@ -335,27 +353,30 @@ aa = optim(par = 1, fn = function(mod_SIV) {
   stats_SIVmod = sodp_stats(SIVmodsf)
   sitSIVmod = subset(stats_SIVmod, SizeClass=="Total", select=c("time", "FracInf"))
   sitSIVmod = sitSIVmod[order(sitSIVmod$time),]
-  timeToFracISIVmod = sitSIVmod$time[min(which(sitSIVmod$FracInf >= frac_I))]
-  cat(timeToFracISIVmod)
+  timeToFracISIVmod = timeToFracI_fn(sitSIVmod, frac_I)
+  if(interactive()) print(timeToFracISIVmod)
   val = ((timeToFracISIVmod - timeToFracI)/timeToFracI)^2
   return(val)
-  })
+  }, method="Brent", lower=0, upper=2)
 
 
-mod_SIV = aa$par
-parms_SIVmod3$alpha = parms_SIV$alpha*mod_SIV[1]
-parms_SIVmod3$lamda = parms_SIV$lamda*mod_SIV[2]
+mod_SIV = cc$par
+parms_SIVmod3$alpha = parms_SIV$alpha*mod_SIV
+parms_SIVmod3$lamda = parms_SIV$lamda*mod_SIV
+parms_SIVmod3$times.max = 50
+parms_SIVmod3$times.by = 0.1
 out_SIVmod3 = run_sodp(parms_SIVmod3)
 SIVmod3sf = process_sodp(out_SIVmod3)
 SIVmod3sf = sodp_totals(SIVmod3sf)
-stats_SIVmod3 = sodp_stats(SIVmod3sf)
+stats_SIVmod3 = sodp_stats(SIVmod3sf, dofit=FALSE)
 stats_SIVmod3.m = melt(stats_SIVmod3, id.vars=c("time", "Species", "SizeClass"))
 
 
 parms_macromod3 = parms_macro
+parms_macromod3$times.max = 18
+parms_macromod3$times.by = 0.01
 
-
-bb = optim(par = aa$par, f = function(mod_macro) {
+dd = optim(par = cc$par, f = function(mod_macro) {
   parms_macromod3$alpha = parms_macro$alpha*mod_macro
   parms_macromod3$lamda = parms_macro$lamda*mod_macro
   out_macromod = run_sodp(parms_macromod3)
@@ -364,21 +385,22 @@ bb = optim(par = aa$par, f = function(mod_macro) {
   stats_macromod = sodp_stats(macromodsf)
   sitmacromod = subset(stats_macromod, SizeClass=="Total", select=c("time", "FracInf"))
   sitmacromod = sitmacromod[order(sitmacromod$time),]
-  timeToFracImacromod = sitmacromod$time[min(which(sitmacromod$FracInf >= frac_I))]
-  cat(timeToFracImacromod)
+  timeToFracImacromod = timeToFracI_fn(sitmacromod, frac_I)
+  if(interactive()) print(timeToFracImacromod)
   val = ((timeToFracImacromod - timeToFracI)/timeToFracI)^2
   return(val)
-  })
+  }, method="Brent", lower=0, upper=2)
 
-mod_macro = bb$par
+mod_macro = dd$par
 
-parms_macromod3$alpha = parms_macro$alpha*mod_macro[1]
-parms_macromod3$lamda = parms_macro$lamda*mod_macro[2]
-
+parms_macromod3$alpha = parms_macro$alpha*mod_macro
+parms_macromod3$lamda = parms_macro$lamda*mod_macro
+parms_macromod3$times.max = 50
+parms_macromod3$times.by = 0.1
 out_macromod3 = run_sodp(parms_macromod3)
 macromod3sf = process_sodp(out_macromod3)
 macromod3sf = sodp_totals(macromod3sf)
-stats_macromod3 = sodp_stats(macromod3sf)
+stats_macromod3 = sodp_stats(macromod3sf, dofit=FALSE)
 stats_macromod3.m = melt(stats_macromod3, id.vars=c("time", "Species", "SizeClass"))
 
 ```
@@ -410,6 +432,132 @@ ggplot(mortInf, aes(x = time, y=value, col=.id, linetype=SizeClass)) +
 
 stats = list(SI=stats_SI.m, SIV=stats_SIVmod3.m, macro=stats_macromod3.m)
 statsall = ldply(stats, function(x) x)
+mortInf = ldply(stats, function(x) subset(x, variable=="FracInf"))
+ggplot(mortInf, aes(x = time, y=value, col=.id, linetype=SizeClass)) +
+  geom_line() +
+#  ylim(0, 0.4) +
+  ylab("Fraction Infected Trees") +
+  xlab("Time") +
+  scale_linetype(labels=c("Juv", "Adult", "Total")) +
+  theme_nr +
+  theme(text=element_text(family="Lato"))
+```
+
+```{r modparms4}
+
+
+frac_I = 0.1
+frac_I2 = 0.3
+sit = subset(stats_SI, SizeClass=="Total", select=c("time", "FracInf"))
+sit = sit[order(sit$time),]
+timeToFracI = timeToFracI_fn(sit, frac_I)
+timeToFracI[2] = timeToFracI_fn(sit, frac_I2)
+
+
+parms_SIVmod4 = parms_SIV
+parms_SIVmod4$progress = 0
+parms_SIVmod4$times.max = 25
+parms_SIVmod4$times.by = 0.01
+
+ee = optim(par = c(1, 1), fn = function(mod_SIV) {
+  parms_SIVmod4$alpha = parms_SIV$alpha*mod_SIV[1]
+  parms_SIVmod4$lamda = parms_SIV$lamda*mod_SIV[2]
+  out_SIVmod = run_sodp(parms_SIVmod4)
+  SIVmodsf = process_sodp(out_SIVmod)
+  SIVmodsf = sodp_totals(SIVmodsf)
+  stats_SIVmod = sodp_stats(SIVmodsf)
+  sitSIVmod = subset(stats_SIVmod, SizeClass=="Total", select=c("time", "FracInf"))
+  sitSIVmod = sitSIVmod[order(sitSIVmod$time),]
+  timeToFracISIVmod = timeToFracI_fn(sitSIVmod, frac_I)
+  timeToFracISIVmod[2] = timeToFracI_fn(sitSIVmod, frac_I2)
+  if(interactive()) print(timeToFracISIVmod)
+  val = sum(((timeToFracISIVmod - timeToFracI)/timeToFracI)^2)
+  return(val)
+  })
+
+
+mod_SIV = ee$par
+parms_SIVmod4$alpha = parms_SIV$alpha*mod_SIV[1]
+parms_SIVmod4$lamda = parms_SIV$lamda*mod_SIV[2]
+parms_SIVmod4$times.max = 50
+parms_SIVmod4$times.by = 0.1
+out_SIVmod4 = run_sodp(parms_SIVmod4)
+SIVmod4sf = process_sodp(out_SIVmod4)
+SIVmod4sf = sodp_totals(SIVmod4sf)
+stats_SIVmod4 = sodp_stats(SIVmod4sf, dofit=FALSE)
+stats_SIVmod4.m = melt(stats_SIVmod4, id.vars=c("time", "Species", "SizeClass"))
+
+
+parms_macromod4 = parms_macro
+parms_macromod4$progress = 0
+parms_macromod4$times.max = 25
+parms_macromod4$times.by = 0.01
+
+
+ff = optim(par = ee$par, f = function(mod_macro) {
+  parms_macromod4$alpha = parms_macro$alpha*mod_macro[1]
+  parms_macromod4$lamda = parms_macro$lamda*mod_macro[2]
+  out_macromod = run_sodp(parms_macromod4)
+  macromodsf = process_sodp(out_macromod)
+  macromodsf = sodp_totals(macromodsf)
+  stats_macromod = sodp_stats(macromodsf)
+  sitmacromod = subset(stats_macromod, SizeClass=="Total", select=c("time", "FracInf"))
+  sitmacromod = sitmacromod[order(sitmacromod$time),]
+  timeToFracImacromod = timeToFracI_fn(sitmacromod, frac_I)
+  timeToFracImacromod[2] = timeToFracI_fn(sitmacromod, frac_I2)
+  if(interactive()) print(timeToFracImacromod)
+  val = sum(((timeToFracImacromod - timeToFracI)/timeToFracI)^2)
+  return(val)
+  })
+
+mod_macro = ff$par
+
+parms_macromod4$alpha = parms_macro$alpha*mod_macro[1]
+parms_macromod4$lamda = parms_macro$lamda*mod_macro[2]
+parms_macromod4$times.max = 50
+parms_macromod4$times.by = 0.1
+out_macromod4 = run_sodp(parms_macromod4)
+macromod4sf = process_sodp(out_macromod4)
+macromod4sf = sodp_totals(macromod4sf)
+stats_macromod4 = sodp_stats(macromod4sf, dofit=FALSE)
+stats_macromod4.m = melt(stats_macromod4, id.vars=c("time", "Species", "SizeClass"))
+
+```
+
+```{r plotcomp4}
+stats = list(SI=stats_SI.m, SIV=stats_SIVmod4.m, macro=stats_macromod4.m)
+statsall = ldply(stats, function(x) x)
+mortInf = ldply(stats, function(x) subset(x, variable=="MortInfRate"))
+ggplot(mortInf, aes(x = time, y=value, col=.id, linetype=SizeClass)) +
+  geom_line() +
+ # ylim(0, 0.4) +
+  ylab("Mortality Rate of Infected Trees") +
+  xlab("Time") +
+  scale_linetype(labels=c("Juv", "Adult", "Total")) +
+  theme_nr +
+  theme(text=element_text(family="Lato"))
+
+
+mortInf = ldply(stats, function(x) subset(x, variable=="N"))
+ggplot(mortInf, aes(x = time, y=value, col=.id, linetype=SizeClass)) +
+  geom_line() +
+#  ylim(0, 0.4) +
+  ylab("Total Population") +
+  xlab("Time") +
+  scale_linetype(labels=c("Juv", "Adult", "Total")) +
+  theme_nr +
+  theme(text=element_text(family="Lato"))
+
+mortInf = ldply(stats, function(x) subset(x, variable=="FracInf"))
+ggplot(mortInf, aes(x = time, y=value, col=.id, linetype=SizeClass)) +
+  geom_line() +
+#  ylim(0, 0.4) +
+  ylab("Fraction Infected Trees") +
+  xlab("Time") +
+  scale_linetype(labels=c("Juv", "Adult", "Total")) +
+  theme_nr +
+  theme(text=element_text(family="Lato"))
+
 mortInf = ldply(stats, function(x) subset(x, variable=="I"))
 ggplot(mortInf, aes(x = time, y=value, col=.id, linetype=SizeClass)) +
   geom_line() +
@@ -419,6 +567,121 @@ ggplot(mortInf, aes(x = time, y=value, col=.id, linetype=SizeClass)) +
   scale_linetype(labels=c("Juv", "Adult", "Total")) +
   theme_nr +
   theme(text=element_text(family="Lato"))
+
+```
+
+
+```{r modparms5}
+
+
+frac_I = 0.1
+sit = subset(stats_SI, SizeClass=="Total", select=c("time", "FracInf"))
+sit = sit[order(sit$time),]
+timeToFracI = timeToFracI_fn(sit, frac_I)
+timeToFracI[2] = subset(stats_SI, time==parms_SI$times.max & SizeClass=="Total")$FracInf
+
+parms_SIVmod5 = parms_SIV
+parms_SIVmod5$progress = 0
+parms_SIVmod5$times.by = 0.01
+
+gg = optim(par = c(1, 1), fn = function(mod_SIV) {
+  parms_SIVmod5$alpha = parms_SIV$alpha*mod_SIV[1]
+  parms_SIVmod5$lamda = parms_SIV$lamda*mod_SIV[2]
+  out_SIVmod = run_sodp(parms_SIVmod5)
+  SIVmodsf = process_sodp(out_SIVmod)
+  SIVmodsf = sodp_totals(SIVmodsf)
+  stats_SIVmod = sodp_stats(SIVmodsf)
+  sitSIVmod = subset(stats_SIVmod, SizeClass=="Total", select=c("time", "FracInf"))
+  sitSIVmod = sitSIVmod[order(sitSIVmod$time),]
+  timeToFracISIVmod = timeToFracI_fn(sitSIVmod, frac_I)
+  timeToFracISIVmod[2]= subset(stats_SIVmod, time==parms_SIVmod5$times.max & SizeClass=="Total")$FracInf
+  if(interactive()) print(timeToFracISIVmod)
+  val = sum(((timeToFracISIVmod - timeToFracI)/timeToFracI)^2)
+  return(val)
+  })
+
+
+mod_SIV = gg$par
+parms_SIVmod5$alpha = parms_SIV$alpha*mod_SIV[1]
+parms_SIVmod5$lamda = parms_SIV$lamda*mod_SIV[2]
+parms_SIVmod5$times.by = 0.1
+out_SIVmod5 = run_sodp(parms_SIVmod5)
+SIVmod5sf = process_sodp(out_SIVmod5)
+SIVmod5sf = sodp_totals(SIVmod5sf)
+stats_SIVmod5 = sodp_stats(SIVmod5sf, dofit=FALSE)
+stats_SIVmod5.m = melt(stats_SIVmod5, id.vars=c("time", "Species", "SizeClass"))
+
+
+parms_macromod5 = parms_macro
+parms_macromod5$progress = 0
+parms_macromod5$times.by = 0.01
+
+
+hh = optim(par = gg$par, f = function(mod_macro) {
+  parms_macromod5$alpha = parms_macro$alpha*mod_macro[1]
+  parms_macromod5$lamda = parms_macro$lamda*mod_macro[2]
+  out_macromod = run_sodp(parms_macromod5)
+  macromodsf = process_sodp(out_macromod)
+  macromodsf = sodp_totals(macromodsf)
+  stats_macromod = sodp_stats(macromodsf)
+  sitmacromod = subset(stats_macromod, SizeClass=="Total", select=c("time", "FracInf"))
+  sitmacromod = sitmacromod[order(sitmacromod$time),]
+  timeToFracImacromod = timeToFracI_fn(sitmacromod, frac_I)
+  timeToFracImacromod[2] = subset(stats_macromod, time==parms_macromod5$times.max & SizeClass=="Total")$FracInf
+  if(interactive()) print(timeToFracImacromod)
+  val = sum(((timeToFracImacromod - timeToFracI)/timeToFracI)^2)
+  return(val)
+  })
+
+mod_macro = hh$par
+
+parms_macromod5$alpha = parms_macro$alpha*mod_macro[1]
+parms_macromod5$lamda = parms_macro$lamda*mod_macro[2]
+parms_macromod5$times.max = 50
+parms_macromod5$times.by = 0.1
+out_macromod5 = run_sodp(parms_macromod5)
+macromod5sf = process_sodp(out_macromod5)
+macromod5sf = sodp_totals(macromod5sf)
+stats_macromod5 = sodp_stats(macromod5sf, dofit=FALSE)
+stats_macromod5.m = melt(stats_macromod5, id.vars=c("time", "Species", "SizeClass"))
+
+```
+
+```{r plotcomp4}
+stats = list(SI=stats_SI.m, SIV=stats_SIVmod5.m, macro=stats_macromod5.m)
+statsall = ldply(stats, function(x) x)
+mortInf = ldply(stats, function(x) subset(x, variable=="MortInfRate"))
+ggplot(mortInf, aes(x = time, y=value, col=.id, linetype=SizeClass)) +
+  geom_line() +
+ # ylim(0, 0.4) +
+  ylab("Mortality Rate of Infected Trees") +
+  xlab("Time") +
+  scale_linetype(labels=c("Juv", "Adult", "Total")) +
+  theme_nr +
+  theme(text=element_text(family="Lato"))
+
+
+mortInf = ldply(stats, function(x) subset(x, variable=="N"))
+ggplot(mortInf, aes(x = time, y=value, col=.id, linetype=SizeClass)) +
+  geom_line() +
+#  ylim(0, 0.4) +
+  ylab("Total Population") +
+  xlab("Time") +
+  scale_linetype(labels=c("Juv", "Adult", "Total")) +
+  theme_nr +
+  theme(text=element_text(family="Lato"))
+
+
+mortInf = ldply(stats, function(x) subset(x, variable=="I"))
+ggplot(mortInf, aes(x = time, y=value, col=.id, linetype=SizeClass)) +
+  geom_line() +
+#  ylim(0, 0.4) +
+  ylab("Infected Trees") +
+  xlab("Time") +
+  scale_linetype(labels=c("Juv", "Adult", "Total")) +
+  theme_nr +
+  theme(text=element_text(family="Lato"))
+
 ```
 
 Currently matching model by equilibrium mortality.  Next, match the models by
@@ -437,22 +700,6 @@ infection, the growth in infected individuals is
 
 $$\lambda_{I_1} - d - \alpha$$
 
-```{r derivs}
-a = init_derivs2(parms_SI, SI=TRUE)
-b = init_derivs2(parms_SIV, SI=TRUE)
-c = init_derivs2(parms_macro, SI=TRUE)
-
-init_derivs2(parms_SI, SI=FALSE)
-init_derivs2(parms_SIV, SI=FALSE)
-init_derivs2(parms_macro, SI=FALSE)
-a
-b
-c
-
-c/a
-
-
-```
 
 Note that the 2nd derivative of $V$ is very small no matter when $I$ is small at $V=H=0$:
 
