@@ -104,13 +104,11 @@ ggplot(mortInf, aes(x = time, y=value, col=.id, linetype=SizeClass)) +
   ylim(0, 0.4) +
   ylab("Mortality Rate of Infected Trees") +
   xlab("Time") +
-  scale_linetype(labels=c("Juv", "Adult", "Total")) +
+  scale_linetype_manual(labels=c("Juv", "Adult", "Total"), values=c(3,2,1)) +
   theme_nr +
-  theme(text=element_text(family="Lato"))
+  theme(text=element_text(family="Lato")) +
+  guides(linetype = guide_legend(reverse=TRUE))
 
-ggplot(statsall, aes(x=time, y=value, col=SizeClass)) + 
- facet_grid(variable~.id, scales="free_y") +
- geom_line() 
 ```
 
 ```{r modparms}

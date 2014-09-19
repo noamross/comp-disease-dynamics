@@ -10,5 +10,3 @@ Description: Manuscript and code for a paper on the interaction of age
 License: CC-BY
 Depends:
     noamtools
-Collate:
-    ''
