@@ -36,7 +36,7 @@ NegBinFit <- function(dat) {
   return(optim(c(mu=mu.start, size=size.start), KLD, dat=dat))
 }
 
-sodp_stats.reg <- function(processed) {
+sodp_stats.reg <- function(processed, dofit=TRUE) {
   stats <- ddply(processed, .(time, Species, SizeClass), summarize,
                  N = sum(Population),
                  P = sum(Population*Infected),
@@ -52,12 +52,14 @@ sodp_stats.reg <- function(processed) {
   stats$MortInfRate = stats$MortInfRate * c(attr(processed, "parms")$alpha, 0)
   stats$MortInfRate[stats$SizeClass=="Total"] = daply(subset(stats, SizeClass != "Total"), .(time, Species), function(x) {
     sum(x$I * x$MortInfRate)/sum(x$I)})
-  fit <- ddply(processed, .(time, Species, SizeClass), function(z) {
-    nbf <- NegBinFit(z$Population)
-    data.frame(NegBin_mu = nbf$par[1], NegBin_k = nbf$par[2], KLD = nbf$value)
-  })
+  if (dofit) { 
+    fit <- ddply(processed, .(time, Species, SizeClass), function(z) {
+      nbf <- NegBinFit(z$Population)
+      data.frame(NegBin_mu = nbf$par[1], NegBin_k = nbf$par[2], KLD = nbf$value)
+    })
+  }
   stats = ddply(stats, .(time, Species), transform, RMortInfRate = MortInfRate/min(MortInfRate))
-  stats <- merge(stats, fit)
+  if (dofit) stats <- merge(stats, fit)
   attr(stats, "parms") <- attr(processed, "parms")
   return(stats)
 }

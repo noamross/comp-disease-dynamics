@@ -1,4 +1,7 @@
 
+
+require(devtools)
+install_github("noamross/noamtools")
 require(deSolve)
 require(plyr)
 require(rootSolve)
@@ -9,6 +12,8 @@ require(grid)
 require(gridExtra)
 require(animation)
 require(noamtools)
+require(foreach)
+require(doMC)
 
 parms = list( 
   n_stages = 2,
@@ -146,6 +151,7 @@ Ks = c(1, seq(5,100, 5))
 names(Ks) = Ks
 multparms = parms
 multparms$progress = 0
+registerDoMC(23)
 multstats = adply(Ks, 1, function(K) {
                           multparms$K = K
                           out = run_sodp(multparms)
