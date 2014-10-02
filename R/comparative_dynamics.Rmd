@@ -2,7 +2,7 @@
 % Noam Ross
 % 14-08-25 10:10:34 
 
-`r library(knitr); opts_chunk$set(echo=FALSE, cache=TRUE, message=FALSE, eval=FALSE)`
+`r library(knitr); opts_chunk$set(echo=FALSE, cache=TRUE, message=FALSE)`
 
 Here I examine the comparative dynamics of age classes in 2-age-class models
 of both $SI$, $SIV$, and macroparasite-style dynamic models.
@@ -43,7 +43,7 @@ parms_SIV =  parms_SI
 parms_SIV$n_parasites = 2
 
 parms_macro = parms_SI
-parms_macro$n_parasites = 150
+parms_macro$n_parasites = 10
 parms_SI$times.by = 0.01
 ```
 
@@ -95,6 +95,19 @@ ggplot(df, aes(x=Infected, y=Population, fill=SizeClass)) +
   xlab("Number of Infections") +
   theme(text=element_text(family="Lato")) +
   facet_wrap(~time, nrow=1)
+
+df2 = data.frame(subset(SIVsf, time %in% times))
+df2 = droplevels(subset(df2, SizeClass != "Total" & Population > 1e-5))
+df2 = df2[order(df2$time),]
+df2$time = factor(paste("Time =", df2$time), levels = paste("Time =", unique(df2$time)))
+ggplot(df2, aes(x=as.factor(Infected), y=Population, fill=SizeClass)) + 
+  geom_bar(stat="identity", position="stack", alpha = 0.5) +
+  scale_fill_grey(labels = c("Juveniles", "Adults")) +
+  scale_x_discrete(labels = c("S", "I", "V")) +
+  theme_nr +
+  xlab("Number of Infections") +
+  theme(text=element_text(family="Lato")) +
+  facet_wrap(~time, nrow=1)
 ```
 
 
@@ -132,7 +145,7 @@ mortInf = ldply(stats, function(x) subset(x, variable %in% c("MortInfRate")))
 p3 = ggplot(mortInf, aes(x = time, y=value, col=.id, linetype=SizeClass, size=SizeClass)) +
   geom_line() +
   ylim(0, 0.4) +
-  ylab("Mortality Rate of Infected Hosts") +
+  ylab("Infected Mortality Rate") +
   xlab(" ") +
   scale_linetype_manual(labels=c("Juv", "Adult", "Total"), values=c(2,6,1)) +
   scale_color_grey() +
@@ -155,7 +168,9 @@ grid.arrange(p1 + theme(legend.position="none"),
              p2 + theme(legend.position="none"),
              p3 + theme(legend.position="none"),
              legend, 
-             widths=unit.c(plotwidth, plotwidth, plotwidth, lwidth), nrow=1)
+             widths=unit.c(plotwidth, plotwidth, plotwidth, lwidth),
+             main = textGrob("Epidemic Dynamics: 1-infection equivalence", gp=gpar(fontsize=20,fontfamily='Lato')),
+              nrow=1)
 ```
 
 ```{r modparms}
@@ -212,62 +227,68 @@ macromodsf = process_sodp(out_macromod)
 macromodsf = sodp_totals(macromodsf)
 stats_macromod = sodp_stats(macromodsf)
 stats_macromod.m = melt(stats_macromod, id.vars=c("time", "Species", "SizeClass"))
-
-# ggplot(stats_SI.m, aes(x=time, y=value, col=SizeClass)) + 
-#  facet_wrap(~variable, scales="free_y") +
-#  geom_line() 
-# 
-# 
-# ggplot(stats_SIVmod.m, aes(x=time, y=value, col=SizeClass)) + 
-#  facet_wrap(~variable, scales="free_y") +
-#  geom_line() 
-# 
-# ggplot(stats_macromod.m, aes(x=time, y=value, col=SizeClass)) + 
-#  facet_wrap(~variable, scales="free_y") +
-#  geom_line() 
 ```
 
 ```{r plotcomp}
 stats = list(SI=stats_SI.m, SIV=stats_SIVmod.m, macro=stats_macromod.m)
 statsall = ldply(stats, function(x) x)
-mortInf = ldply(stats, function(x) subset(x, variable=="MortInfRate"))
-ggplot(mortInf, aes(x = time, y=value, col=.id, linetype=SizeClass)) +
+
+mortInf = ldply(stats, function(x) subset(x, variable %in% c("N")))
+p1 = ggplot(mortInf, aes(x = time, y=value, col=.id, linetype=SizeClass, size=SizeClass)) +
+  geom_line() +
+  ylim(0, 1) +
+  ylab("Host Population") +
+  xlab(" ") +
+  scale_linetype_manual(labels=c("Juv", "Adult", "Total"), values=c(2,6,1)) +
+  scale_color_grey() +
+  scale_size_manual(values=c(1,1, 2), guide='none') + 
+  theme_nr +
+  theme(text=element_text(family="Lato")) +
+  guides(linetype = guide_legend(reverse=TRUE))
+
+mortInf = ldply(stats, function(x) subset(x, variable %in% c("I")))
+p2 = ggplot(mortInf, aes(x = time, y=value, col=.id, linetype=SizeClass, size=SizeClass)) +
+  geom_line() +
+  ylim(0, 1) +
+  ylab("Infected Hosts") +
+  xlab("Time") +
+  scale_linetype_manual(labels=c("Juv", "Adult", "Total"), values=c(2,6,1)) +
+  scale_color_grey() +
+  scale_size_manual(values=c(1,1, 2), guide='none') + 
+  theme_nr +
+  theme(text=element_text(family="Lato")) +
+  guides(linetype = guide_legend(reverse=TRUE))
+
+mortInf = ldply(stats, function(x) subset(x, variable %in% c("MortInfRate")))
+p3 = ggplot(mortInf, aes(x = time, y=value, col=.id, linetype=SizeClass, size=SizeClass)) +
   geom_line() +
   ylim(0, 0.4) +
-  ylab("Mortality Rate of Infected Trees") +
-  xlab("Time") +
-  scale_linetype(labels=c("Juv", "Adult", "Total")) +
+  ylab("Infected Mortality Rate") +
+  xlab(" ") +
+  scale_linetype_manual(labels=c("Juv", "Adult", "Total"), values=c(2,6,1)) +
+  scale_color_grey() +
+  scale_size_manual(values=c(1,1, 2), guide='none') + 
   theme_nr +
-  theme(text=element_text(family="Lato"))
+  theme(text=element_text(family="Lato")) +
+  guides(linetype = guide_legend(reverse=TRUE))
 
-stats = list(SI=stats_SI.m, SIV=stats_SIVmod.m, macro=stats_macromod.m)
-statsall = ldply(stats, function(x) x)
-mortInf = ldply(stats, function(x) subset(x, variable=="N"))
-ggplot(mortInf, aes(x = time, y=value, col=.id, linetype=SizeClass)) +
-  geom_line() +
-#  ylim(0, 0.4) +
-  ylab("Total Population") +
-  xlab("Time") +
-  scale_linetype(labels=c("Juv", "Adult", "Total")) +
-  theme_nr +
-  theme(text=element_text(family="Lato"))
+g_legend <- function(p){
+tmp <- ggplotGrob(p)
+leg <- which(sapply(tmp$grobs, function(x) x$name) == "guide-box")
+legend <- tmp$grobs[[leg]]
+return(legend)}
 
-stats = list(SI=stats_SI.m, SIV=stats_SIVmod.m, macro=stats_macromod.m)
-statsall = ldply(stats, function(x) x)
-mortInf = ldply(stats, function(x) subset(x, variable=="I"))
-ggplot(mortInf, aes(x = time, y=value, col=.id, linetype=SizeClass)) +
-  geom_line() +
-#  ylim(0, 0.4) +
-  ylab("Infected Trees") +
-  xlab("Time") +
-  scale_linetype(labels=c("Juv", "Adult", "Total")) +
-  theme_nr +
-  theme(text=element_text(family="Lato"))
+legend <- g_legend(p1)
+lwidth <- sum(legend$width)
+plotwidth = (unit(1, "npc") - lwidth)*(1/3)
 
-# ggplot(subset(statsall, variable %in% c("N", "P", "S", "I", "FracInf", "Mean", "MortInfRate") & time <= 100),
-#        aes(x=time, y=value, col=SizeClass)) + 
-#  facet_grid(.id~variable) +
-#  geom_line() 
+grid.arrange(p1 + theme(legend.position="none"), 
+             p2 + theme(legend.position="none"),
+             p3 + theme(legend.position="none"),
+             legend, 
+             widths=unit.c(plotwidth, plotwidth, plotwidth, lwidth),
+             main = textGrob("Epidemic Dynamics: Equilibrium Mortality Equivalence", gp=gpar(fontsize=20,fontfamily='Lato')),
+              nrow=1)
 ```
 
 ```{r modparms2}
@@ -324,39 +345,63 @@ stats_macromod2.m = melt(stats_macromod2, id.vars=c("time", "Species", "SizeClas
 ```{r plotcomp2}
 stats = list(SI=stats_SI.m, SIV=stats_SIVmod2.m, macro=stats_macromod2.m)
 statsall = ldply(stats, function(x) x)
-mortInf = ldply(stats, function(x) subset(x, variable=="MortInfRate"))
-ggplot(mortInf, aes(x = time, y=value, col=.id, linetype=SizeClass)) +
-  geom_line() +
- # ylim(0, 0.4) +
-  ylab("Mortality Rate of Infected Trees") +
-  xlab("Time") +
-  scale_linetype(labels=c("Juv", "Adult", "Total")) +
-  theme_nr +
-  theme(text=element_text(family="Lato"))
 
-stats = list(SI=stats_SI.m, SIV=stats_SIVmod2.m, macro=stats_macromod2.m)
-statsall = ldply(stats, function(x) x)
-mortInf = ldply(stats, function(x) subset(x, variable=="N"))
-ggplot(mortInf, aes(x = time, y=value, col=.id, linetype=SizeClass)) +
+mortInf = ldply(stats, function(x) subset(x, variable %in% c("N")))
+p1 = ggplot(mortInf, aes(x = time, y=value, col=.id, linetype=SizeClass, size=SizeClass)) +
   geom_line() +
-#  ylim(0, 0.4) +
-  ylab("Total Population") +
-  xlab("Time") +
-  scale_linetype(labels=c("Juv", "Adult", "Total")) +
+  ylim(0, 1) +
+  ylab("Host Population") +
+  xlab(" ") +
+  scale_linetype_manual(labels=c("Juv", "Adult", "Total"), values=c(2,6,1)) +
+  scale_color_grey() +
+  scale_size_manual(values=c(1,1, 2), guide='none') + 
   theme_nr +
-  theme(text=element_text(family="Lato"))
+  theme(text=element_text(family="Lato")) +
+  guides(linetype = guide_legend(reverse=TRUE))
 
-stats = list(SI=stats_SI.m, SIV=stats_SIVmod2.m, macro=stats_macromod2.m)
-statsall = ldply(stats, function(x) x)
-mortInf = ldply(stats, function(x) subset(x, variable=="FracInf"))
-ggplot(mortInf, aes(x = time, y=value, col=.id, linetype=SizeClass)) +
+mortInf = ldply(stats, function(x) subset(x, variable %in% c("I")))
+p2 = ggplot(mortInf, aes(x = time, y=value, col=.id, linetype=SizeClass, size=SizeClass)) +
   geom_line() +
-#  ylim(0, 0.4) +
-  ylab("Infected Trees") +
+  ylim(0, 1) +
+  ylab("Infected Hosts") +
   xlab("Time") +
-  scale_linetype(labels=c("Juv", "Adult", "Total")) +
+  scale_linetype_manual(labels=c("Juv", "Adult", "Total"), values=c(2,6,1)) +
+  scale_color_grey() +
+  scale_size_manual(values=c(1,1, 2), guide='none') + 
   theme_nr +
-  theme(text=element_text(family="Lato"))
+  theme(text=element_text(family="Lato")) +
+  guides(linetype = guide_legend(reverse=TRUE))
+
+mortInf = ldply(stats, function(x) subset(x, variable %in% c("MortInfRate")))
+p3 = ggplot(mortInf, aes(x = time, y=value, col=.id, linetype=SizeClass, size=SizeClass)) +
+  geom_line() +
+  ylim(0, 0.6) +
+  ylab("Infected Mortality Rate") +
+  xlab(" ") +
+  scale_linetype_manual(labels=c("Juv", "Adult", "Total"), values=c(2,6,1)) +
+  scale_color_grey() +
+  scale_size_manual(values=c(1,1, 2), guide='none') + 
+  theme_nr +
+  theme(text=element_text(family="Lato")) +
+  guides(linetype = guide_legend(reverse=TRUE))
+
+g_legend <- function(p){
+tmp <- ggplotGrob(p)
+leg <- which(sapply(tmp$grobs, function(x) x$name) == "guide-box")
+legend <- tmp$grobs[[leg]]
+return(legend)}
+
+legend <- g_legend(p1)
+lwidth <- sum(legend$width)
+plotwidth = (unit(1, "npc") - lwidth)*(1/3)
+
+grid.arrange(p1 + theme(legend.position="none"), 
+             p2 + theme(legend.position="none"),
+             p3 + theme(legend.position="none"),
+             legend, 
+             widths=unit.c(plotwidth, plotwidth, plotwidth, lwidth),
+             main = textGrob("Epidemic Dynamics: Equivalent Initial Derivatives", gp=gpar(fontsize=20,fontfamily='Lato')),
+             nrow=1)
 ```
 
 
@@ -447,39 +492,63 @@ stats_macromod3.m = melt(stats_macromod3, id.vars=c("time", "Species", "SizeClas
 ```{r plotcomp3}
 stats = list(SI=stats_SI.m, SIV=stats_SIVmod3.m, macro=stats_macromod3.m)
 statsall = ldply(stats, function(x) x)
-mortInf = ldply(stats, function(x) subset(x, variable=="MortInfRate"))
-ggplot(mortInf, aes(x = time, y=value, col=.id, linetype=SizeClass)) +
-  geom_line() +
- # ylim(0, 0.4) +
-  ylab("Mortality Rate of Infected Trees") +
-  xlab("Time") +
-  scale_linetype(labels=c("Juv", "Adult", "Total")) +
-  theme_nr +
-  theme(text=element_text(family="Lato"))
 
-stats = list(SI=stats_SI.m, SIV=stats_SIVmod3.m, macro=stats_macromod3.m)
-statsall = ldply(stats, function(x) x)
-mortInf = ldply(stats, function(x) subset(x, variable=="N"))
-ggplot(mortInf, aes(x = time, y=value, col=.id, linetype=SizeClass)) +
+mortInf = ldply(stats, function(x) subset(x, variable %in% c("N")))
+p1 = ggplot(mortInf, aes(x = time, y=value, col=.id, linetype=SizeClass, size=SizeClass)) +
   geom_line() +
-#  ylim(0, 0.4) +
-  ylab("Total Population") +
-  xlab("Time") +
-  scale_linetype(labels=c("Juv", "Adult", "Total")) +
+  ylim(0, 1) +
+  ylab("Host Population") +
+  xlab(" ") +
+  scale_linetype_manual(labels=c("Juv", "Adult", "Total"), values=c(2,6,1)) +
+  scale_color_grey() +
+  scale_size_manual(values=c(1,1, 2), guide='none') + 
   theme_nr +
-  theme(text=element_text(family="Lato"))
+  theme(text=element_text(family="Lato")) +
+  guides(linetype = guide_legend(reverse=TRUE))
 
-stats = list(SI=stats_SI.m, SIV=stats_SIVmod3.m, macro=stats_macromod3.m)
-statsall = ldply(stats, function(x) x)
-mortInf = ldply(stats, function(x) subset(x, variable=="FracInf"))
-ggplot(mortInf, aes(x = time, y=value, col=.id, linetype=SizeClass)) +
+mortInf = ldply(stats, function(x) subset(x, variable %in% c("I")))
+p2 = ggplot(mortInf, aes(x = time, y=value, col=.id, linetype=SizeClass, size=SizeClass)) +
   geom_line() +
-#  ylim(0, 0.4) +
-  ylab("Fraction Infected Trees") +
+  ylim(0, 1) +
+  ylab("Infected Hosts") +
   xlab("Time") +
-  scale_linetype(labels=c("Juv", "Adult", "Total")) +
+  scale_linetype_manual(labels=c("Juv", "Adult", "Total"), values=c(2,6,1)) +
+  scale_color_grey() +
+  scale_size_manual(values=c(1,1, 2), guide='none') + 
   theme_nr +
-  theme(text=element_text(family="Lato"))
+  theme(text=element_text(family="Lato")) +
+  guides(linetype = guide_legend(reverse=TRUE))
+
+mortInf = ldply(stats, function(x) subset(x, variable %in% c("MortInfRate")))
+p3 = ggplot(mortInf, aes(x = time, y=value, col=.id, linetype=SizeClass, size=SizeClass)) +
+  geom_line() +
+  ylim(0, 0.4) +
+  ylab("Infected Mortality Rate") +
+  xlab(" ") +
+  scale_linetype_manual(labels=c("Juv", "Adult", "Total"), values=c(2,6,1)) +
+  scale_color_grey() +
+  scale_size_manual(values=c(1,1, 2), guide='none') + 
+  theme_nr +
+  theme(text=element_text(family="Lato")) +
+  guides(linetype = guide_legend(reverse=TRUE))
+
+g_legend <- function(p){
+tmp <- ggplotGrob(p)
+leg <- which(sapply(tmp$grobs, function(x) x$name) == "guide-box")
+legend <- tmp$grobs[[leg]]
+return(legend)}
+
+legend <- g_legend(p1)
+lwidth <- sum(legend$width)
+plotwidth = (unit(1, "npc") - lwidth)*(1/3)
+
+grid.arrange(p1 + theme(legend.position="none"), 
+             p2 + theme(legend.position="none"),
+             p3 + theme(legend.position="none"),
+             legend,
+             widths=unit.c(plotwidth, plotwidth, plotwidth, lwidth),
+             main = textGrob("Epidemic Dynamics: Equivalent Time to 10% infection", gp=gpar(fontsize=20,fontfamily='Lato')),
+             nrow=1)
 ```
 
 ```{r modparms4}
@@ -566,52 +635,68 @@ stats_macromod4.m = melt(stats_macromod4, id.vars=c("time", "Species", "SizeClas
 ```{r plotcomp4}
 stats = list(SI=stats_SI.m, SIV=stats_SIVmod4.m, macro=stats_macromod4.m)
 statsall = ldply(stats, function(x) x)
-mortInf = ldply(stats, function(x) subset(x, variable=="MortInfRate"))
-ggplot(mortInf, aes(x = time, y=value, col=.id, linetype=SizeClass)) +
+
+mortInf = ldply(stats, function(x) subset(x, variable %in% c("N")))
+p1 = ggplot(mortInf, aes(x = time, y=value, col=.id, linetype=SizeClass, size=SizeClass)) +
   geom_line() +
- # ylim(0, 0.4) +
-  ylab("Mortality Rate of Infected Trees") +
-  xlab("Time") +
-  scale_linetype(labels=c("Juv", "Adult", "Total")) +
+  ylim(0, 1) +
+  ylab("Host Population") +
+  xlab(" ") +
+  scale_linetype_manual(labels=c("Juv", "Adult", "Total"), values=c(2,6,1)) +
+  scale_color_grey() +
+  scale_size_manual(values=c(1,1, 2), guide='none') + 
   theme_nr +
-  theme(text=element_text(family="Lato"))
+  theme(text=element_text(family="Lato")) +
+  guides(linetype = guide_legend(reverse=TRUE))
 
-
-mortInf = ldply(stats, function(x) subset(x, variable=="N"))
-ggplot(mortInf, aes(x = time, y=value, col=.id, linetype=SizeClass)) +
+mortInf = ldply(stats, function(x) subset(x, variable %in% c("I")))
+p2 = ggplot(mortInf, aes(x = time, y=value, col=.id, linetype=SizeClass, size=SizeClass)) +
   geom_line() +
-#  ylim(0, 0.4) +
-  ylab("Total Population") +
+  ylim(0, 1) +
+  ylab("Infected Hosts") +
   xlab("Time") +
-  scale_linetype(labels=c("Juv", "Adult", "Total")) +
+  scale_linetype_manual(labels=c("Juv", "Adult", "Total"), values=c(2,6,1)) +
+  scale_color_grey() +
+  scale_size_manual(values=c(1,1, 2), guide='none') + 
   theme_nr +
-  theme(text=element_text(family="Lato"))
+  theme(text=element_text(family="Lato")) +
+  guides(linetype = guide_legend(reverse=TRUE))
 
-mortInf = ldply(stats, function(x) subset(x, variable=="FracInf"))
-ggplot(mortInf, aes(x = time, y=value, col=.id, linetype=SizeClass)) +
+mortInf = ldply(stats, function(x) subset(x, variable %in% c("MortInfRate")))
+p3 = ggplot(mortInf, aes(x = time, y=value, col=.id, linetype=SizeClass, size=SizeClass)) +
   geom_line() +
-#  ylim(0, 0.4) +
-  ylab("Fraction Infected Trees") +
-  xlab("Time") +
-  scale_linetype(labels=c("Juv", "Adult", "Total")) +
+  ylim(0, 0.6) +
+  ylab("Infected Mortality Rate") +
+  xlab(" ") +
+  scale_linetype_manual(labels=c("Juv", "Adult", "Total"), values=c(2,6,1)) +
+  scale_color_grey() +
+  scale_size_manual(values=c(1,1, 2), guide='none') + 
   theme_nr +
-  theme(text=element_text(family="Lato"))
+  theme(text=element_text(family="Lato")) +
+  guides(linetype = guide_legend(reverse=TRUE))
 
-mortInf = ldply(stats, function(x) subset(x, variable=="I"))
-ggplot(mortInf, aes(x = time, y=value, col=.id, linetype=SizeClass)) +
-  geom_line() +
-#  ylim(0, 0.4) +
-  ylab("Infected Trees") +
-  xlab("Time") +
-  scale_linetype(labels=c("Juv", "Adult", "Total")) +
-  theme_nr +
-  theme(text=element_text(family="Lato"))
+g_legend <- function(p){
+tmp <- ggplotGrob(p)
+leg <- which(sapply(tmp$grobs, function(x) x$name) == "guide-box")
+legend <- tmp$grobs[[leg]]
+return(legend)}
 
+legend <- g_legend(p1)
+lwidth <- sum(legend$width)
+plotwidth = (unit(1, "npc") - lwidth)*(1/3)
+
+grid.arrange(p1 + theme(legend.position="none"), 
+             p2 + theme(legend.position="none"),
+             p3 + theme(legend.position="none"),
+             legend, 
+             widths=unit.c(plotwidth, plotwidth, plotwidth, lwidth),
+             main = textGrob("Epidemic Dynamics: Equivalent time to 10% and 30% infection", gp=gpar(fontsize=20,fontfamily='Lato')),
+              nrow=1)
 ```
 
 
 ```{r modparms5}
-
+ 
 
 frac_I = 0.1
 sit = subset(stats_SI, SizeClass=="Total", select=c("time", "FracInf"))
@@ -686,41 +771,66 @@ stats_macromod5.m = melt(stats_macromod5, id.vars=c("time", "Species", "SizeClas
 
 ```
 
-```{r plotcomp4}
+```{r plotcomp5}
 stats = list(SI=stats_SI.m, SIV=stats_SIVmod5.m, macro=stats_macromod5.m)
 statsall = ldply(stats, function(x) x)
-mortInf = ldply(stats, function(x) subset(x, variable=="MortInfRate"))
-ggplot(mortInf, aes(x = time, y=value, col=.id, linetype=SizeClass)) +
+
+mortInf = ldply(stats, function(x) subset(x, variable %in% c("N")))
+p1 = ggplot(mortInf, aes(x = time, y=value, col=.id, linetype=SizeClass, size=SizeClass)) +
   geom_line() +
- # ylim(0, 0.4) +
-  ylab("Mortality Rate of Infected Trees") +
-  xlab("Time") +
-  scale_linetype(labels=c("Juv", "Adult", "Total")) +
+  ylim(0, 1) +
+  ylab("Host Population") +
+  xlab(" ") +
+  scale_linetype_manual(labels=c("Juv", "Adult", "Total"), values=c(2,6,1)) +
+  scale_color_grey() +
+  scale_size_manual(values=c(1,1, 2), guide='none') + 
   theme_nr +
-  theme(text=element_text(family="Lato"))
+  theme(text=element_text(family="Lato")) +
+  guides(linetype = guide_legend(reverse=TRUE))
 
-
-mortInf = ldply(stats, function(x) subset(x, variable=="N"))
-ggplot(mortInf, aes(x = time, y=value, col=.id, linetype=SizeClass)) +
+mortInf = ldply(stats, function(x) subset(x, variable %in% c("I")))
+p2 = ggplot(mortInf, aes(x = time, y=value, col=.id, linetype=SizeClass, size=SizeClass)) +
   geom_line() +
-#  ylim(0, 0.4) +
-  ylab("Total Population") +
+  ylim(0, 1) +
+  ylab("Infected Hosts") +
   xlab("Time") +
-  scale_linetype(labels=c("Juv", "Adult", "Total")) +
+  scale_linetype_manual(labels=c("Juv", "Adult", "Total"), values=c(2,6,1)) +
+  scale_color_grey() +
+  scale_size_manual(values=c(1,1, 2), guide='none') + 
   theme_nr +
-  theme(text=element_text(family="Lato"))
+  theme(text=element_text(family="Lato")) +
+  guides(linetype = guide_legend(reverse=TRUE))
 
-
-mortInf = ldply(stats, function(x) subset(x, variable=="I"))
-ggplot(mortInf, aes(x = time, y=value, col=.id, linetype=SizeClass)) +
+mortInf = ldply(stats, function(x) subset(x, variable %in% c("MortInfRate")))
+p3 = ggplot(mortInf, aes(x = time, y=value, col=.id, linetype=SizeClass, size=SizeClass)) +
   geom_line() +
-#  ylim(0, 0.4) +
-  ylab("Infected Trees") +
-  xlab("Time") +
-  scale_linetype(labels=c("Juv", "Adult", "Total")) +
+  ylim(0, 0.6) +
+  ylab("Infected Mortality Rate") +
+  xlab(" ") +
+  scale_linetype_manual(labels=c("Juv", "Adult", "Total"), values=c(2,6,1)) +
+  scale_color_grey() +
+  scale_size_manual(values=c(1,1, 2), guide='none') + 
   theme_nr +
-  theme(text=element_text(family="Lato"))
+  theme(text=element_text(family="Lato")) +
+  guides(linetype = guide_legend(reverse=TRUE))
 
+g_legend <- function(p){
+tmp <- ggplotGrob(p)
+leg <- which(sapply(tmp$grobs, function(x) x$name) == "guide-box")
+legend <- tmp$grobs[[leg]]
+return(legend)}
+
+legend <- g_legend(p1)
+lwidth <- sum(legend$width)
+plotwidth = (unit(1, "npc") - lwidth)*(1/3)
+
+grid.arrange(p1 + theme(legend.position="none"), 
+             p2 + theme(legend.position="none"),
+             p3 + theme(legend.position="none"),
+             legend, 
+             widths=unit.c(plotwidth, plotwidth, plotwidth, lwidth),
+             main = textGrob("Epidemic Dynamics: Equivalent time to 10% infection and equilibrium mortality", gp=gpar(fontsize=20,fontfamily='Lato')),
+              nrow=1)
 ```
 
 Currently matching model by equilibrium mortality.  Next, match the models by
