@@ -692,7 +692,7 @@ are the same.
 ## Warning: font family 'Lato' not found in PostScript font database
 ```
 
-![plot of chunk complots](figure/complots.png) 
+![plot of chunk base_comparison](figure/base_comparison.png) 
 
 
 ```
@@ -972,7 +972,7 @@ are the same.
 ## Warning: font family 'Lato' not found in PostScript font database
 ```
 
-![plot of chunk plotcomp](figure/plotcomp.png) 
+![plot of chunk equiv_equilib](figure/equiv_equilib.png) 
 
 
 ```
@@ -1770,7 +1770,7 @@ are the same.
 ## Warning: font family 'Lato' not found in PostScript font database
 ```
 
-![plot of chunk plotcomp2](figure/plotcomp2.png) 
+![plot of chunk init_derivs](figure/init_derivs.png) 
 
 
 
@@ -2057,7 +2057,7 @@ are the same.
 ## Warning: font family 'Lato' not found in PostScript font database
 ```
 
-![plot of chunk plotcomp3](figure/plotcomp3.png) 
+![plot of chunk time_to_I10](figure/time_to_I10.png) 
 
 
 ```
@@ -2466,7 +2466,7 @@ are the same.
 ## Warning: font family 'Lato' not found in PostScript font database
 ```
 
-![plot of chunk plotcomp4](figure/plotcomp4.png) 
+![plot of chunk time_to_I1030](figure/time_to_I1030.png) 
 
 
 
@@ -2855,7 +2855,7 @@ are the same.
 ## Warning: font family 'Lato' not found in PostScript font database
 ```
 
-![plot of chunk plotcomp5](figure/plotcomp5.png) 
+![plot of chunk time_to_I10_equib](figure/time_to_I10_equib.png) 
 
 Currently matching model by equilibrium mortality.  Next, match the models by
 initial growth behavior.  That is, growth rate at time zero, or R0.   How do
