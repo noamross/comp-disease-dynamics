@@ -1,9 +1,6 @@
 ---
 author: Noam Ross
 date: 'September 16, 2014'
-output:
-  html_document:
-    keep_md: True
 title: 'Comparative dynamics of SI and multiple-infection models'
 ...
 
