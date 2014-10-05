@@ -67,135 +67,157 @@ dynamics between multi-infection and
 Methods
 -------
 
-1.  I compared dynamics in 3 ODE-based disease models: A simple $SI$ model, and
-    multi-infection model after @Anderson1978, and an intermediate $SIV$
-    (susceptible-infected-*very* infected) model.
+### Model Structure
 
-    1.  A simple model of an $SI$ epidemic in a population with
-        density-dependent recruitment and a two-stage population structure.
+I compared dynamics in 3 ODE-based disease models: A simple $SI$ model, an
+multi-infection model based on @Anderson1978, and an intermediate $SIV$
+(susceptible-infected-*very* infected) model.
 
-        $$\begin{aligned}
-          \frac{dJ_S}{dt} &= fN(1 - N/K) -
-                             J_S(d + g + \lambda J_I + \lambda A_I)
-          &\frac{dA_S}{dt} &= g J_S - A_S(d + \lambda N) \\
-          \frac{dJ_I}{dt} &= \lambda J_S (J_I + A_I) - J_I(d + g + \alpha)
-          &\frac{dA_I}{dt} &= g J_I + \lambda A_S (J_I + A_I) -
-                              A_I(d + \alpha) \\
-          N &= J_S + A_S + J_I + A_I
-        \end{aligned}$$
+Each model has a two-stage population structure (population $N$ = juveniles
+$J$ + adults $A$). New individuals enter the uninfected, juvenile stage via
+density-dependent recruitment ($fN(1-N/K)$, where $f$ is fecunidity and $K$
+carrying capacity). Individuals move from juvenile to adult classes at the
+transition rate $g$.
 
-    2.  For the $SIV$ and multi-structure models, there are additional classes
-        representing degrees of infection. Mortality $(\alpha)$ and infectivity
-        $(\lambda)$ are additive in these models.
+Disease transmission is density-dependent; susceptible individuals $(J_S, A_S)$
+become infected $(J_I, A_I)$ at a rate equal to the density of other infected
+individuals times the transmissivity of the disease $(\lambda)$. All individuals
+die at the a base rate $(d)$, and diseased individuals have additional mortality
+$(\alpha)$
 
-        $$\begin{aligned}
-          \frac{dJ_0}{dt} &= fN(1 - N/K) - J_0(d + g + \Lambda)
-          &\frac{dA_0}{dt} &= g J_0 - A_0(d + \Lambda) \\
-          \frac{dJ_i}{dt} &= \Lambda dJ_{i-1} -
-                             J_i(d + g + i\alpha + \Lambda)
-          &\frac{dA_i}{dt} &= g J_i + \Lambda A_{i-1} -
-                             A_i(d + i\alpha + \Lambda) \\
-          \frac{dJ_k}{dt} &= \Lambda dJ_{k-1} - J_k(d + g + k\alpha)
-          &\frac{dA_k}{dt} &= g J_k + \Lambda A_{k-1} - A_k(d + k\alpha) \\
-          N &= \sum_{i=0}^k J_0 + A_0
-          &\Lambda &= \lambda \sum_{i=1}^k i(J_i + A_i)
-        \end{aligned}$$
+The complete $SI$ model is
 
-        For $SIV$ model, $i_\max = k = 2$. I refer $N_0$ as $S$, $N_1$ as $I$
-        and $N_2$ as $V$, and use $S$, $I$, and $V$, as subscripts for $J$, and
-        $A$ as well.
+$$\begin{aligned}
+  \frac{dJ_S}{dt} &= fN(1 - N/K) -
+                     J_S(d + g + \lambda J_I + \lambda A_I)
+  &\frac{dA_S}{dt} &= g J_S - A_S(d + \lambda N) \\
+  \frac{dJ_I}{dt} &= \lambda J_S (J_I + A_I) - J_I(d + g + \alpha)
+  &\frac{dA_I}{dt} &= g J_I + \lambda A_S (J_I + A_I) -
+                      A_I(d + \alpha) \\
+  N &= J_S + A_S + J_I + A_I
+\end{aligned}$$
+
+Note that this is a *null model* of age structure; neither demographic nor
+epidemiological parameters vary with age. When juvenile and adult classes are
+summed, the growth term $g$ drops out, and $dN/dt$ is independent of $g$.
+
+The other two models are extensions of the $SI$ model with additional disease
+classes representing degrees of infection. In the multi-infection model, there
+are an infinite number of disease classes designated
+$i = 0, 1, 2, \dots, \infty$. For purposes of simulation, the number of classes
+is truncated, with a maximum value of $k$. Transmissivity $(\lambda)$ and
+mortality $(\alpha)$ and are additive in these models. Trees advance to the next
+disease class at rate $\Lambda$, the overall force of infection, which is the
+sum of each tree's contribution, $i\lambda$. Trees in each stage die at rate
+$d + i\alpha$. The complete multi-infection model.
+
+$$\begin{aligned}
+  \frac{dJ_0}{dt} &= fN(1 - N/K) - J_0(d + g + \Lambda)
+  &\frac{dA_0}{dt} &= g J_0 - A_0(d + \Lambda) \\
+  \frac{dJ_i}{dt} &= \Lambda dJ_{i-1} -
+                     J_i(d + g + i\alpha + \Lambda)
+  &\frac{dA_i}{dt} &= g J_i + \Lambda A_{i-1} -
+                     A_i(d + i\alpha + \Lambda) \\
+  \frac{dJ_k}{dt} &= \Lambda dJ_{k-1} - J_k(d + g + k\alpha)
+  &\frac{dA_k}{dt} &= g J_k + \Lambda A_{k-1} - A_k(d + k\alpha) \\
+  N &= \sum_{i=0}^k J_0 + A_0
+  &\Lambda &= \lambda \sum_{i=1}^k i(J_i + A_i)
+\end{aligned}$$
+
+The $SIV$ model is merely a truncated version of the multi-infection model, with
+$k = 2$. For this model I refer $N_0$ as $S$, $N_1$ as $I$ and $N_2$ as $V$, and
+use $S$, $I$, and $V$, as subscripts for $J$, and $A$ as well.
 
 In this paper, parameters (e.g., $\lambda$ and $\alpha$) are subscripted with
-$\text{param}_{SI}$, $\text{param}_SIV$, or $\text{param}_\text{multi}$ when
+$\text{param}_{SI}$, $\text{param}_{SIV}$, or $\text{param}_\text{multi}$ when
 referring to their values in each of the three models. I also use the term
 "infected" to refer to individuals of either the $I$ class in the $SI$ model, or
 having at least one infection in the $SIV$ or multi-infection models.
 
-For the multi-infection model, $i_\max = k = \infty$. For numerical simulations,
-this value is truncated to 150. Performed simulations in R (@REF), using the
-deSolve package (@REF)
+Multi-infection models typically assume a distribution of infections in order to
+reduce the system of equations [@Anderson1978]. Negative-binomial distributions
+of infections allow tractable analysis of such models and match empirical
+studies of infection distribution in the wild [@REF]. However, the reduced model
+only approximates the full model asymptotically [@Adler1992], and key
+assumptions of the reduced model break down in the presence of age structure
+(See Appendix.) Instead, I avoided making such assumptiosn by simulating the the
+infinite system of equations truncating at $k$.
 
-3.  These are *null models* of age structure, as both demographic and
-    epidemiological parameters do not vary with age. When juvenile and adult
-    classes are summed the growth therm $(g)$ drops out.
+### Comparative parameterization
 
-4.  We simulated the full model rather than the reduced model based on an
-    assumption of negative-binomial distributions, as the negative- binomial
-    only approximates the full model asymptotically @Adler1992. In Appendex
-    @REF, we show that it also deviates from the full model at equilibrium when
-    age structure is introduced.
+I compared the models' behaviors under "equivalent" parameterizations. As the
+models have different structures, their parameters in the models have different
+interpretations. Specifically, $\lambda$ and $\alpha$ operate on a
+per-individual basis in the $SI$ model, while they operate on a per-infection
+basis on the $SIV$ and multi-infection models. Thus, they are not *identical*
+parameterizations.
 
-As the models are different structurally. I parameterized the $SIV$ and
-multi-infection models so that their behavior was identical according to several
-different criteria. In all these comparisons, I consider the "infected" trees of
-the SIV and multi-infection models as those with one or more infections.
-
-The behavior of SIV and multi-infection models were adjusted by multiplying both
-the infectivity $(\lambda_{SIV}, \lambda_{multi})$ and disease-induced mortality
+In order to determine equivalent parameterizations between models, I set
+parameters for the $SI$ model to those in Table 1. I then fit the $SIV$ and
+multi-infection models so that they would exhibit identical *behavior* to the
+$SI$ model under different criteria. The behavior of SIV and multi-infection
+models were adjusted by multiplying both the infectivity
+$(\lambda_{SIV}, \lambda_{multi})$ and disease-induced mortality
 $(\alpha_{SIV}, \alpha_{multi})$ parameters by a constant $c$. Where there there
 were dual behavior criteria (behaviors (4) and (5) below), the $\lambda$ and
-$\alpha$ were allowed to vary independently in order to minimize the objective
-functions.
+$\alpha$ values were allowed to vary independently.
 
--   **Equilibrium mortality rate**. Models were parametrized so that the
-    mortality rate of infected trees at equilibrium was equal. That is,
+Initial conditions in simulations were set at the disease-free equilibrium of
+the system, modified with 1% of both juveniles and adults having a single
+infection.
 
-$$\alpha_{SI} = \alpha_SIV \frac{I + 2V}{I+V} 
+  Parameter                                          Symbol      Base Case Value
+  ------------------------------------------------ ----------- -----------------
+  fecundity                                            $f$                     1
+  carrying capacity                                    $K$                     1
+  transition rate                                      $g$                   0.1
+  mortality                                            $d$                  0.01
+  disease-induced mortality                         $\alpha$                 0.2
+  transmissivity                                    $\lambda$                  3
+  max number of infections (SIV/multi-infection)       $k$               3 / 150
+
+Table 1: Base parameters for disease models
+
+**Equilibrium mortality rate**. The first behavioral criterion was identical
+equilibrium mortality rate across models. $c$ was varied to match the overall
+disease-induced mortality rate (and thus the total mortality rate) between
+models. That is, at steady state,
+$$\alpha_{SI} = \alpha_{SIV} \frac{I + 2V}{I+V} 
               = \alpha_\text{multi} \frac{1}{N} \sum_i i N_i$$
 
--   Initial growth rate and acceleration of infected individuals. That is\
-     $$\begin{aligned}
-                \frac{dI}{dt}      &= \frac{d(I+V)}{dt} 
-                                    = \frac{dN_{i > 0}}{dt} \text{, and} \\
-                \frac{d^2 I}{dt^2} &= \frac{d^2(I+V)}{dt^2}
-                                    = \frac{d^2 N_{i > 0}}{dt^2}
-        \end{aligned}$$ at initial conditions of $S \approx N$,
-    $I_{SI} = I_{SIV} = N_{1\, multi} \approx 0$ and
-    $I_{SIV} = N_{i \geq 2\, multi} = 0$.
+**Initial growth and acceleration rates of infected individuals.** $c$ was
+adjusted to match behavior under initial conditions. This is,
 
-    Initial conditions in simulations were disease-free equilibrium, with 1% of
-    individuals having a single infection (across both stage classes).
+$$\begin{aligned}
+            \frac{dI}{dt}      &= \frac{d(I+V)}{dt} 
+                                = \frac{dN_{i > 0}}{dt} \text{, and} \\
+            \frac{d^2 I}{dt^2} &= \frac{d^2(I+V)}{dt^2}
+                                = \frac{d^2 N_{i > 0}}{dt^2}
+    \end{aligned}$$ at initial conditions of $S \approx N$,
+$I_{SI} = I_{SIV} = N_{1\, multi} \approx 0$ and
+$I_{SIV} = N_{i \geq 2\, multi} = 0$.
 
-    Note that the first condition, of the initial growth rate of infected
-    individuals, is identical at all cases under these initial conditions. Thus,
-    we only fit to the second derivative.
+Note that the first condition, of the initial growth rate of infected
+individuals, is identical at all cases under these initial conditions. Thus, we
+only fit to the second derivative. Derivatives were determined numerically using
+the numDeriv packages [@REF].
 
-    -   Time to 10%, 50%, and 90% infection. That is
+**Time to 10% infection**. This criterion was selected to match behavior among
+models during the early transient period of disease. $c$ was adjusted so that
+the $SIV$ and multi-infection models would reach 10% infection in the same time
+period as the $SI$ model. That is
 
-        $$t\big|_{\frac{I}{S+I} = X\%} = t\big|_{\frac{I+V}{S+I+V} = X\%}
-                                = t\big|_{\frac{N_{i \geq 1}}{N} = X\%}$$
+$$t\big|_{\frac{I}{S+I} = X\%} = t\big|_{\frac{I+V}{S+I+V} = X\%}
+                        = t\big|_{\frac{N_{i \geq 1}}{N} = X\%}$$
 
-    -   Time to 10% and equilibrium mortality rate combined.
-    -   Minimizing the overall squared error between the models over time.\*
-
-  Parameter                     Symbol      Base Case Value
-  --------------------------- ----------- -----------------
-  fecundity                       $f$                     1
-  carrying capacity               $K$                     1
-  transition rate                 $g$                   0.1
-  mortality                       $d$                  0.01
-  disease-induced mortality    $\alpha$                 0.2
-  transmissivity               $\lambda$                  3
-
-  : Base parameters for disease models
-
-In the base case,
+All simulations simulations were performed in R (@REF), using the deSolve
+package (@REF) for simulation and the ggplot (@REF) package for plotting. Code
+to reproduce these results is archived online [@Ross2014].
 
 Results
 -------
 
-1.  Qualitative differences between SI and multi-infection models are largely
-    present in the differences between SI and SIV models. As the number of
-    infection classes increases, model behavior approaches the behavior of the
-    infinite-class multiple-infection model.
-
-2.  Bifurcation analysis
-
-    1.  Calculation of $R_0$ for all 3 models. Demonstration that $R_0$, initial
-        disease growth rate, are identical for all 3.
-
-    2.  Common behavior above and below $R_0 = 1$. Disease suppresses
-        equilibrium population size.
+1.  
 
 3.  Models with similar equilibrium behavior differ in their transients as
     epidemics get under way.
@@ -234,11 +256,10 @@ single infected class, mortality rates remain constant.
 ![Figure: Dynamics of models parameterized to equivalent equilibrium mortality
 rates](figure/init_derivs.png)
 
-
-When models are parameterized so that 1st and 2nd derivatives are the
-same across SI and multi-infection, per-infection parameters in the
-multi-infection models (mortality and infectivity), are the same as
-per-individual parameters in the SI model.
+When models are parameterized so that 1st and 2nd derivatives are the same
+across SI and multi-infection, per-infection parameters in the multi-infection
+models (mortality and infectivity), are the same as per-individual parameters in
+the SI model.
 
 As in previous parameterizations, mortality for infected individuals increase
 over time until equilibrium is reached. Unlike the last parameterization,
@@ -306,6 +327,11 @@ model, these differences do not arise.
 2.  These effects increase as the transition rate from juvenile to adult age
     classes increase. this changes the relative amount of time individuals in
     each class have had to acquire infections.
+    
+Qualitative differences between SI and multi-infection models are largely
+    present in the differences between SI and SIV models. As the number of
+    infection classes increases, model behavior approaches the behavior of the
+    infinite-class multiple-infection model.
 
 Discussion
 ----------
