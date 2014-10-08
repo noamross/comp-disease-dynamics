@@ -57,8 +57,8 @@ library(data.table)
 library(noamtools)
 library(numDeriv)
 library(gridExtra)
-source('R/process_sodp.R')
-source('R/run_sodp.R')
+source('../R/process_sodp.R')
+source('../R/run_sodp.R')
 ```
 
 ```{r runmodels}
@@ -101,11 +101,11 @@ df2 = droplevels(subset(df2, SizeClass != "Total" & Population > 1e-5))
 df2 = df2[order(df2$time),]
 df2$time = factor(paste("Time =", df2$time), levels = paste("Time =", unique(df2$time)))
 ggplot(df2, aes(x=as.factor(Infected), y=Population, fill=SizeClass)) + 
-  geom_bar(stat="identity", position="stack", alpha = 0.5) +
+  geom_bar(stat="identity", position="dodge", alpha = 0.5) +
   scale_fill_grey(labels = c("Juveniles", "Adults")) +
   scale_x_discrete(labels = c("S", "I", "V")) +
   theme_nr +
-  xlab("Number of Infections") +
+  xlab("Disease Class") +
   theme(text=element_text(family="Lato")) +
   facet_wrap(~time, nrow=1)
 ```
