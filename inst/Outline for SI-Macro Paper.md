@@ -1,7 +1,7 @@
 ---
 author: Noam Ross
-date: 'September 16, 2014'
-title: 'Comparative dynamics of SI and multiple-infection models'
+date: 'October 8, 2014'
+title: 'Comparative dynamics of SI and multiple-infection models: Outline with draft methods and results.'
 ...
 
 Introduction
@@ -15,7 +15,7 @@ Introduction
     disease, chytridiomycosis, white nose syndrome), have been found to be
     driven by spore loads. [@Briggs2010, @KateSporeLoad, @DaphniaPapersbyDuffy]
 
-(Here I use the term multi-infection to refer to such diseases)
+    (Here I use the term multi-infection to refer to such diseases)
 
 3.  The multi-infection, or macroparasite framework [@Anderson1978] may be a
     more appropriate model for such diseases than SIR models.
@@ -205,10 +205,10 @@ the numDeriv packages [@REF].
 **Time to 10% infection**. This criterion was selected to match behavior among
 models during the early transient period of disease. $c$ was adjusted so that
 the $SIV$ and multi-infection models would reach 10% infection in the same time
-period as the $SI$ model. That is
+period as the $SI$ model. That is,
 
-$$t\big|_{\frac{I}{S+I} = X\%} = t\big|_{\frac{I+V}{S+I+V} = X\%}
-                        = t\big|_{\frac{N_{i \geq 1}}{N} = X\%}$$
+$$t\big|_{\frac{I}{S+I} = 0.1} = t\big|_{\frac{I+V}{S+I+V} = 0.1}
+                        = t\big|_{\frac{N_{i \geq 1}}{N} = 0.1}$$
 
 All simulations simulations were performed in R (@REF), using the deSolve
 package (@REF) for simulation and the ggplot (@REF) package for plotting. Code
@@ -217,103 +217,128 @@ to reproduce these results is archived online [@Ross2014].
 Results
 -------
 
-1.  
+### Aggregate dynamics
 
-3.  Models with similar equilibrium behavior differ in their transients as
-    epidemics get under way.
-
-    1.  Models with equivalent equilibrium behavior will have very different
-        invasion criteria. Multi-infection will be *less* likely to become
-        epidemic from a single infection
-
-    2.  Figure X shows the dynamic behavior of the $SI$, $SIV$, and
-        multi-infection models calibrated to equivalent mortality at
-        equilibrium. At equilibrium, the both population levels and mortality
-        rates of the *aggregate* population (across all age classes), is
-        identical across all models as all rates are equal.
+<!-- [BIFURCATION RESULTS FIRST HERE] -->
+**Models with similar equilibrium behavior differ in initial transient
+behavior**. Figure 1 shows the dynamic behavior of the $SI$, $SIV$, and
+multi-infection models calibrated to equivalent mortality at equilibrium. At
+equilibrium. Under the base case parameterization, all models reach an internal
+equilibrium with a population level suppressed from the disease-free equilibrium
+at which they started. As all other rates are equal, the equilibrium populations
+are identical between the models, as well.
 
 Under this parameterization, the ratio of $\alpha$ values between the models is
-equal to the mean number of infections at equilibrium in the multi-infection and
-$SIV$ models.
+the inverse of the mean number of infections at equilibrium in the
+multi-infection and $SIV$ models.
 
 ![Figure: Dynamics of models parameterized to equivalent equilibrium mortality
 rates](figure/equiv_equilib.png)
 
-Here, the $SI$ model is fastest to reach equilibrium, while the $SIV$ model
-takes longer and the multi-infection takes longest.
-
+<!--TODO: Get the \alpha values for the parameterized models -->
+<!--FIX: The plot only shows \alpha.  It should show \alpha + d->
+<!--FIX: Change plot "macro" to multi-->
+<!--FIX: Plots need to go past 50 to reach age dist equilibrium-->
 In the $SIV$ and multi-infection models, the apparent mortality rate of infected
 individuals increases over time. Early in the epidemic, individuals have small
 numbers of infections, thus the mortality rate across individuals with any level
-of infection is small. As the epidemic progresses, the mean number of infections
+of infection is low. As the epidemic progresses, the mean number of infections
 per infected individual increases, raising the mortality rate of the infected
-class until equilibrium is reached. The time to equilibrium is greater in the
-multi-infection model than the $SIV$ model. In the $SI$ model, which only has a
-single infected class, mortality rates remain constant.
+class until equilibrium is reached.
 
-4.  Models with similar initial behavior reach different equilibrium conditions
-
-![Figure: Dynamics of models parameterized to equivalent equilibrium mortality
-rates](figure/init_derivs.png)
-
-When models are parameterized so that 1st and 2nd derivatives are the same
-across SI and multi-infection, per-infection parameters in the multi-infection
-models (mortality and infectivity), are the same as per-individual parameters in
-the SI model.
-
-As in previous parameterizations, mortality for infected individuals increase
-over time until equilibrium is reached. Unlike the last parameterization,
-however, mortality rates for the $SIV$ and multi-infection models start at
-*higher* levels than the $SI$ model and further diverge over time.
-
-Greater mortality rates among infected individuals results in a greater
-suppression of equilibrium population in the $SIV$ and multi-infection models
-than the $SI$ model, with the effect, as before, being greater but qualitatively
-similar in the multi-infection model.
-
-The $SIV$ and multi-infection models have greater fractions of infected
-individuals, but fewer infected individuals overall, due to the suppressed
-population.
-
-Fig X shows the results when models were parameterized to have equivalent time
-until 10% of the total population was infected. While initial mortality rates
-differ from the matched-second-derivative parameterization, patterns are
-qualitatively similar; mortality rates for individuals in $SIV$ and
-multi-infection models increase before reaching equilibrium, resulting in lower
-equilibrium population sizes and greater fractions of infected individuals.
-
-![Figure: Dynamics of models parameterized to equivalent equilibrium mortality
-rates](figure/time_to_I10.png)
-
-These results are very similar to those under parameterizations of time to 30%
-and 50% infection (not shown, in Appendix).
-
-5.  Multi-infection models generate age-dependent effects not found in SI models
-
-All three models exhibit a common pattern the dynamics of population stage
-structure, with a decrease in the population of adult stages and an increase in
-the population of the juvenile stage.
-
-The infected population of adult trees peaks before declining late in the
-epidemic.
-
-![Figure: Dynamics of models parameterized to equivalent equilibrium mortality
-rates](figure/progplot1.png)
+The change in mortality rates is driven by changes in the distribution of
+infections over time, shown in Figures 2 and 3. As the disease progresses
+through the population, the proportion of individuals in teh $I$ and $V$ classes
+increases for both juveniles and adults. Similarly, in the multi-infection
+model, the mean number of infections in each individual increases over time,
+increasing the mortality rate.
 
 ![Figure: Dynamics of models parameterized to equivalent equilibrium mortality
 rates](figure/progplot2.png)
 
-In the $SIV$ and multi-infection models, the mortality rate of infected trees
-diverges for juvenile and adults as the disease progresses. This occurs in all
-parameterizations. At equilibrium, the mortality rate of adult infected trees is
-greater than that of juvenile trees.
+![Figure: Dynamics of models parameterized to equivalent equilibrium mortality
+rates](figure/progplot1.png)
 
-The reason for this can be found in figures X-Y, which show the distribution of
-infections for both adult and juvenile populations over the course of the
-epidemic in $SIV$ and multi-infection models. Adults and juveniles begin with
-equal mean numbers of infections, but as the epidemic continues, adult trees
-accumulate more infections than juveniles by both new infections on adult trees,
-and already-infected juveniles recruiting into the adult population.
+While equilibrium behaviors are identical and models start at the same initial
+conditions, transient behavior differs. The time to equilibrium is greater in
+the multi-infection model than the $SIV$ model, and greater in both than the
+$SI$ model. It takes longer in the $SIV$ model, and longest in the
+multi-infection model, for the disease to emerge.
+
+**Models with similar initial behavior reach different equilibrium conditions.**
+Figure 4 shows the dynamics of the three models in the case where the initial
+first and second derivatives are equivalent. As in the matching-equilibrium
+parameterizations, mortality for infected individuals increases over time until
+equilibrium is reached. Unlike that parameterization, per-infection parameters
+in the $SIV$/multi-infection models (mortality and infectivity), are higher than
+than per-individual parameters in the $SI$ model. Total mortality rates for the
+$SIV$ and multi-infection models start at *higher* levels than the $SI$ model
+and further diverge over time.
+
+The $SIV$ and multi-infection models have nearly identical behavior. At
+equilibrium, their populations are suppressed to lower levels than in the $SI$
+model, and a smaller number of the individuals are infected. This is because the
+difference in mortality rates of infected individuals between the $SI$ and the
+other models is greater, increasing turnover of infected individuals. In this
+case, the $SIV$ and multi-infection models reach equilibrium *before* the $SI$
+model.
+
+![Figure: Dynamics of models parameterized to equivalent initial growth rates of
+diseased individuals](figure/init_derivs.png)
+
+Fig 5 shows the results when models were parameterized to have equivalent time
+until 10% of the total population was infected. Here, the initial mortality
+rates of the $SIV$ and multi-infection models are similar to those in the $SI$
+model; per-infection parameters in $SIV$/multi-infection models are similar to
+per-individual parameters in the $SI$ model.
+
+![Figure: Dynamics of models parameterized to equivalent time to 10%
+infection](figure/time_to_I10.png)
+
+Patterns in the time-to-10%-infection parameterizations are qualitatively
+similar to the matched-second-derivative parameterization. Mortality rates for
+individuals in $SIV$ and multi-infection models increase before reaching
+equilibrium, resulting in lower population sizes and lower populations of
+infected individuals at equilibrium. Dynamics for the $SIV$ and multi-infection
+models are again very similar, though not as similar as in the
+matched-derivative case. Also, in this case, the number of infected individuals
+reaches a peak before going down to reach equilibrium levels.
+
+### Age effects
+
+<!-- FIX: Something is up with the patterning of age classes in the middle panel
+of all the plots -->
+**Multi-infection models generate age-dependent effects not found in SI
+models.**
+
+All three models, under all three parameterization exhibit some common patterns
+in the dynamics of population stages. From the disease-free equilibrium
+dominated by adults, disease outbreak decreases the population of adult stages
+and and increases both the relative and absolute population of the juvenile
+stages. The infected population of both stages increases, with the adult
+infected stage reaching a peak before equilibrium and the juvenile infected
+stage reaching a smaller equilibrium with no peak.
+
+In the equivalent equilibrium mortality parameterization, The $SIV$ and
+multi-infection stage structures are slower to reach an equilibrium than the
+$SI$ stage structure, with the multi-infection case being slowest. This is
+similar to the aggregate dynamics for this parameterization. In the case of
+equivalent initial derivatives, as will as the case of equivalent time to 10%
+infection, the change in age structure from the disease-free equilibrium is
+greater in the $SIV$ and multi-infection models than the $SI$ model. at
+equilibrium, there are more juveniles and fewer adults in the
+$SIV$/multi-infection cases.
+
+In the $SIV$ and multi-infection models, the mortality rate of infected
+juveniles and adults increases as the disease progresses, and their mortality
+rate diverges, with adults having greater mortality rates than juveniles at
+equilibrium. This occurs in all parameterizations. The reason for this can be
+found in figures 2 and 3, which show the distribution of infections for both
+adult and juvenile populations over the course of the epidemic in $SIV$ and
+multi-infection models. Adults and juveniles begin with equal mean numbers of
+infections, but as the epidemic continues, adult trees accumulate more
+infections than juveniles by both new infections on adult trees and
+already-infected juveniles recruiting into the adult population.
 
 In a multi-infection model with age structure, individuals accumulate infections
 over time, resulting in more infections, and thus greater mortality and
@@ -322,16 +347,15 @@ absence of age-driven variation in how individuals respond to disease (that is,
 in a "null model"), different behavior is observed between age groups. In an SI
 model, these differences do not arise.
 
-1.  Figure showing evolution of infection distributions over time.
+<!-- ADD figs for:
+1.  Models with equivalent equilibrium behavior will have very different
+    invasion criteria. Multi-infection will be *less* likely to become
+    epidemic from a single infection
 
 2.  These effects increase as the transition rate from juvenile to adult age
     classes increase. this changes the relative amount of time individuals in
-    each class have had to acquire infections.
+    each class have had to acquire infections.  -->
     
-Qualitative differences between SI and multi-infection models are largely
-    present in the differences between SI and SIV models. As the number of
-    infection classes increases, model behavior approaches the behavior of the
-    infinite-class multiple-infection model.
 
 Discussion
 ----------
@@ -339,10 +363,10 @@ Discussion
 1.  Epidemics that appear to be well represented by $SI$ models during their
     outbreak phase may no longer be well represented in later stages.
 
-    1.  A multi-infection model that behaves like an $SI$ model in early stages
-        will have greater mortality rates at equilibrium, suppressing population
-        more. A *smaller* fraction of the population will be infected at
-        equilibrium, because it
+    A multi-infection model that behaves like an $SI$ model in early stages will
+    have greater mortality rates at equilibrium, suppressing population more. A
+    *smaller* fraction of the population will be infected at equilibrium,
+    because it
 
 2.  If a disease is driven by multi-infection mechanisms, age effects may (in
     part) be artifacts of infection accumulation in older individuals, rather
@@ -356,6 +380,11 @@ Discussion
 
 3.  Reduced version of multi-infection model (SIV) is sufficient for many
     applications.
+
+    Qualitative differences between SI and multi-infection models are largely
+    present in the differences between SI and SIV models. As the number of
+    infection classes increases, model behavior approaches the behavior of the
+    infinite-class multiple-infection model.
 
 4.  Future work
 
@@ -374,14 +403,3 @@ Appendix:
 
 2.  Show analysis of divergence of simplified version of multi-infection model
     [@Anderson1978] from full model when age structure.
-
-**Notes from Meeting with Alan, September 16, 2014**
-
-Different than epidemics, which are all transients, transients here with host
-population dynamics.
-
-Analysis of SIRs has been focused on total individuals getting disease, rather
-than time scale of buildup. Assume separation of time scales.
-
-Diekman's textbooks on that for review. From more mathematical perspective Fred
-Bauer and Carlos Castilo Chavez. Springer books.
