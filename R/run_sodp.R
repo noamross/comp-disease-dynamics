@@ -1,3 +1,4 @@
+library(R.cache)
 #' Simulate the infinite set of equations
 #' @export
 #' @importFrom deSolve lsoda
