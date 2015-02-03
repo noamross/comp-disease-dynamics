@@ -14,7 +14,8 @@ The raw uncompiled paper is an R Markdown file,  found in `inst/2014-12-18-manus
 figures, and compile the paper as a PDF or HTML file, (already generated in the
 `inst` directory).
 
-Code run in the paper is stored externally in `comparative_simulations.R`.
+Code run in the paper is stored externally in `inst/comparative_simulations.R`, with
+parameters set in `inst/base_parms.R`.
 Functions are found in the `R/` directory.
 
 Feedback is more than welcome in whatever form you want, including
