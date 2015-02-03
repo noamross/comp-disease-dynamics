@@ -5,16 +5,20 @@ author: "Noam Ross"
 date: "December 18, 2014"
 output:
   html_document:
+    dev:
+    - svg
+    - png
     fig_caption: yes
     fig_height: 6
     fig_width: 12
-    dev: [svg, png]
   pdf_document:
+    dev:
+    - cairo_pdf
+    - cairo_ps
     fig_caption: yes
     fig_height: 6
     fig_width: 12
     latex_engine: xelatex
-    dev: [cairo_pdf, cairo_ps]
 csl: ecology.csl
 bibliography: references.bib
 ---
