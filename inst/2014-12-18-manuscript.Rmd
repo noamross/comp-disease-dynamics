@@ -37,13 +37,13 @@ Introduction
 ------------
 
 Emerging fungal infections pose major threats to plant and animal wildlife
-populations as well has livestock and crops, as do oomycetes, which have similar
-life-histories to fungi. These common life history traits, including high
+populations as well has livestock and crops. Fungal life-history traits, including high
 virulence, long-lived environmental reservoirs, and host generalism are thought
 to contribute to the potential of these pathogens to drive local and global
-extinctions of some species [@Fisher2012; @Eskew2013].
+extinctions of some species [@Fisher2012; @Eskew2013]. Oomycetes, a taxonomically distinct 
+group from fungi that nonetheless many of these traits, pose similar threats.
 
-An important component fungal host-pathogen dynamics is the role of spore load
+An important component of fungal host-pathogen dynamics is the role of spore load
 in driving host infection and mortality. @Briggs2010 showed that
 population-level persistence or extinction of mountain yellow-legged frogs (*R.
 sierrae*) infected by chytrid fungus (*Batrachochytrium dendrobatidis*), could
@@ -58,8 +58,8 @@ which are generally resistant to fungal diseases or asymptotic under normal
 conditions may nonetheless become infected and exhibit symptoms or mortality
 under persistent exposure to large fungal spore loads [@Casadevall2005].
 
-Many plant diseases also present as an accumulation of local infections, rather
-than systemic infections, and this has long been recognized as an important
+Accumulation of local infections, rather
+than systemic infections, has long been recognized as an important
 component of plant disease dynamics [@Waggoner1981; @Dobson1994;
 @McRoberts2003], especially in cases of parasitic plants such as mistletoe
 [@Martinez1996]. Sudden Oak Death, caused by the oomycete *Phyophthora ramorum*,
@@ -67,16 +67,25 @@ kills tanoak (*Notholithocarpus densiflorus*) faster in the presence of large
 numbers of other infected hosts, indicating that continued accumulation of
 infections, rather than just disease progress, drives mortality [@Cobb2012].
 
-Most attempts to model fungal disease dynamics have used various modifications
-of tradition susceptible-infected (*SI*) disease frameworks, which represent
-disease as a binary state of the host. Extensions such as
+Most attempts to model fungal disease dynamics have used traditional susceptible-infected (*SI*) disease frameworks, which represent
+disease as a binary state of the host [@Kermack1927]. Extensions such as
 susceptible-exposed-infected-removed (*SEIR*) models represent disease
 progression within hosts, but do not capture the accumulation of *new*
-infections that may drive disease impacts. This dynamic may be better captured
+infections in hosts that may drive disease impacts. This dynamic may be better captured
 using the framework created by @Anderson1978 to model macroparasite infections,
-where disease is represented as an indefinite number of discrete infections (or
+where disease is represented by the number of discrete infections (or
 parasites), within each host. Here I use the term multi-infection to describe
 these models.
+
+Response to disease outbreak often requires prediction of medium- and long-term
+behavior from early-phase dynamics of disease, which in turn requires
+mechanistic disease models. However, in early stages of epidemics of emerging
+diseases, the importance of disease load may not be known, nor the
+appropriateness of multi-infection rather than *SI* models. Disease load is
+often considerably more difficult to measure than prevalence, allowing only
+observations of susceptible vs. infected states. However, model choice may have
+considerable influence on predictions of disease dynamics and management
+response.
 
 Age and stage structure is another potentially important factor driving fungal
 disease dynamics. The effect of Chytrid fungus on frogs varies across
@@ -89,8 +98,7 @@ host-pathogen dynamics.
 There is a considerable literature on host-pathogen dynamics of in age- and
 stage-structured populations using *SI* models [@CastilloChavez1989; @Busenberg1990; @Diekmann1990; @Hethcote2000;
 @Dietz2002; @Klepac2010]. There is a somewhat
-smaller literature on disease in multi-infecton models, especially in cases
-where host populations vary on the same time scale as the disease. In
+smaller literature on age structure in multi-infecton models. In
 multi-infection models, @Krasnov2006 showed that parasite counts increase with
 age in rodents. @Pacala1988 created a method to detect the mortality effect of
 macroparasites based of the distribution of parasites among different age
@@ -99,18 +107,8 @@ a variety of age- time- and density-dependent processes, but also showed that
 interpretation of such age-infection patterns was ambiguous if more than one
 such process was operating.
 
-Response to disease outbreak often requires prediction of medium- and long-term
-behavior from early-phase dynamics of disease, which in turn requires
-mechanistic disease models. However, in early stages of epidemics of emerging
-diseases, the importance of disease load may not be known, nor the
-appropriateness of multi-infection rather than *SI* models. Disease load is
-often considerably more difficult to measure than prevalence, allowing only
-observations of susceptible vs. infected states. However, model choice may have
-considerable influence on predictions of disease dynamics and management
-response.
-
-Here I explore how host-pathogen dynamics differ between *SI* and
-multi-infection models. I examine how *SI* and multi-infections models differ
+Here I explore how the transient host-pathogen dynamics differ between *SI* and
+multi-infection systems. I examine how *SI* and multi-infections models differ
 long-term dynamics when parameterized to fit identical short-term conditions,
 and vice versa. I also explore how patterns of disease across life stages differ
 between over the course of epidemics in *SI* and multi-infection models.
@@ -191,8 +189,8 @@ reduce the system of equations [@Anderson1978]. Negative-binomial distributions
 of infections allow tractable analysis of such models and match empirical
 studies of infection distribution in the wild [@Wilson2002]. However, the reduced model
 only approximates the full model asymptotically [@Adler1992], and key
-assumptions of the reduced model break down in the presence of age structure
-(See Appendix.) Instead, I avoided making such assumptions by simulating the the
+assumptions of the reduced model break down in the presence of age structure.
+Instead, I avoided making such assumptions by simulating the the
 infinite system of equations truncating at $k$.
 
 ### Comparative parameterization
