@@ -19,9 +19,9 @@ parameters set in `inst/base_parms.R`.
 Functions are found in the `R/` directory.
 
 Feedback is more than welcome in whatever form you want, including
-[email](mailto:noam.ross@gmail.com), and [Github
-issues](https://github.com/noamross/comp-disease-dynamics/issues/new), and pull
-requests. Any contributions will be awknowledged. Contact me first if you want
+[email](mailto:noam.ross@gmail.com), filing a [Github
+issue](https://github.com/noamross/comp-disease-dynamics/issues/new), or a pull
+request. Any contributions will be awknowledged. Contact me first if you want
 to contribute something big enough to be considered co-authorship.
 
 All text in this repo is CC-BY. Code is MIT licensed and any data generated is
