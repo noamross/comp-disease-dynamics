@@ -325,7 +325,7 @@ the models $(c)$ is the inverse of the mean number of infections at equilibrium
 in the $SIV$ and multi-infection models. This value is `r round(mod_SIV, 2)` for
 the SIV model and `r round(mod_multi, 2)` for the multi-infection model.
 
-```{r Fig1, fig.cap="Figure 1: Dynamics of models parameterized to equivalent equilibrium mortality rates"}
+```{r Fig1, fig.cap="Dynamics of models parameterized to equivalent equilibrium mortality rates"}
 <<equiv_equilib>>
 equiv_equilib_comp_plot
 ```
@@ -344,12 +344,12 @@ $I$ and $V$ classes increases for both juveniles and adults. Similarly, in the
 multi-infection model, the mean number of infections in each individual
 increases over time, increasing the mortality rate.
 
-```{r Fig2, fig.cap="Figure 2: Dynamics infection classes in the SIV model"}
+```{r Fig2, fig.cap="Dynamics infection classes in the SIV model"}
 <<progplot>>
 progplot_SIV
 ```
 
-```{r Fig3, fig.cap="Figure 3: Dynamics of infection classes in the multi-infection model"}
+```{r Fig3, fig.cap="Dynamics of infection classes in the multi-infection model"}
 progplot_multi
 ```
 
@@ -384,7 +384,7 @@ model.
 
 
 
-```{r Fig4, fig.cap="Figure 4: Dynamics of models parameterized to equivalent initial rates of growth of infectious individuals"}
+```{r Fig4, fig.cap="Dynamics of models parameterized to equivalent initial rates of growth of infectious individuals"}
 <<init_derivs>>
 init_derivs_comp_plot
 ```
@@ -401,7 +401,7 @@ $SI$ model. Here $c$ is `r round(mod_SIV, 2)` for the SIV model and
 `r round(mod_multi, 2)` for the multi-infection model.
 
 
-```{r Fig5, fig.cap="Figure 5: Dynamics of models parameterized to equivalent time to 10% infected individuals"}
+```{r Fig5, fig.cap="Dynamics of models parameterized to equivalent time to 10% infected individuals"}
 <<time_to_I10>>
 time_to_I10_comp_plot
 ```
@@ -534,12 +534,12 @@ the dynamics of these disease be distinguished from those of $SI$-like processes
 in the data from early-stage emerging epidemics, especially when data are of
 disease prevalence rather than load? One way to distinguish these mechanisms is
 to look for changes in mortality rate as disease progresses or between early- or
-late-period populations, or to look for differences in mortality rate among age
-classes. Both these patterns can indicate multi-infection-driven processes.
-However, similar to what @Duerr2003 demonstrated, such patterns are not
-sufficient to disentangle the multiple processe that may drive mortality
-patterns. Direct measurements relationships between infection load and host
-effects are needed to establish the role of multi-infection processes.
+late-epidemic populations, or to look for differences in mortality rate among age
+classes. Both these patterns can indicate multi-infection-driven processes, though such patterns are not
+sufficient to disentangle the multiple processes that may drive mortality
+patterns. Instead, these patterns can indicate the potential role of these mechanisms,
+and the need to investigte the relationships between infection load and host
+effects.
 
 <!-- 
 Appendix [TODO]:
