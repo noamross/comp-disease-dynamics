@@ -1,16 +1,13 @@
 ---
 title: 'Host-pathogen dynamics in fungal diseases: Comparing SI and multi-infection
   models'
-author: "Noam Ross"
+author:
+- affiliation: UCD
+  email: nmross\@ucdavis.edu
+  footnote: Corresponding author
+  name: Noam Ross
 date: "December 18, 2014"
 output:
-  html_document:
-    dev:
-    - svg
-    - png
-    fig_caption: yes
-    fig_height: 6
-    fig_width: 12
   pdf_document:
     dev:
     - cairo_pdf
@@ -18,9 +15,41 @@ output:
     fig_caption: yes
     fig_height: 6
     fig_width: 12
-    latex_engine: xelatex
-csl: ecology.csl
+    keep_tex: yes
+    template: elsarticle.latex
+  html_document:
+    dev:
+    - svg
+    - png
+    fig_caption: yes
+    fig_height: 6
+    fig_width: 12
+    keep_md: yes
+csl: ecology-letters.csl
+address:
+- address: |
+    Department of Environmental Science and Policy
+    University of California-Davis
+    1 Shields Avenue Davis, CA 95616 USA
+  code: UCD
+documentclass: elsarticle
+layout: review,12pt
+linenumbers: yes
 bibliography: references.bib
+abstract: |
+  Emerging fungal disease pose major threats to plants and wildlife. As effects of
+  many fungal diseases are load-dependent, they may be better represented by
+  models with variable loads (multi-infection), rather than susceptible-infected
+  (SI) models. I compare equilibrium and transient behavior between these model
+  types, including the dynamics of age structure. To compare models with different
+  structure, I parameterized multi-infection models to replicate SI behavior at
+  either initial or equilibrium phases of an epidemic, comparing the resultant
+  behavior at other phases. Multi-infection diseases have either slower initial
+  growth rates of disease than SI models, or have greater population-suppressing
+  effects. Multi-infection models also produce greater relative mortality in older
+  host stages, and greater overall changes in population age structure, than SI
+  models. These results indicate that using SI models to predict epidemic behavior
+  when diseases are load-dependent may underestimate long-term effects.
 ---
 
 ```{r get_chunks, echo=FALSE, results='hide', message=FALSE, warning=FALSE, cache=FALSE}
@@ -112,8 +141,11 @@ interpretation of such age-infection patterns was ambiguous if more than one
 such process was operating.
 
 Here I explore how the transient host-pathogen dynamics differ between *SI* and
-multi-infection systems. I examine how *SI* and multi-infections models differ
-long-term dynamics when parameterized to fit identical short-term conditions,
+multi-infection systems. To compare models that with different structures and in
+which parameters have different interpretations, I fit the models to each other
+so that they have identical *dynamic behaviors* at different stages of an epidemic.
+I examine how *SI* and multi-infection models differ
+in long-term dynamics when parameterized to fit identical short-term conditions,
 and vice versa. I also explore how patterns of disease across life stages differ
 between over the course of epidemics in *SI* and multi-infection models.
 
@@ -132,11 +164,11 @@ density-dependent recruitment ($fN(1-N/K)$, where $f$ is fecunidity and $K$
 carrying capacity). Individuals move from juvenile to adult classes at the
 transition rate $g$.
 
-Disease transmission is density-dependent; susceptible individuals $(J_S, A_S)$
-become infected $(J_I, A_I)$ at a rate equal to the density of other infected
+Disease transmission is density-dependent; In the *SI* model, susceptible individuals $(J_S, A_S)$
+become infected $(J_I, A_I)$ at a rate equal to the density of infected
 individuals times the transmissivity of the disease $(\lambda)$. All individuals
 die at the a base rate $(d)$, and diseased individuals have additional mortality
-$(\alpha)$
+$(\alpha)$.
 
 The complete $SI$ model is
 
@@ -159,7 +191,7 @@ classes representing degrees of infection. In the multi-infection model, there
 are an infinite number of disease classes designated
 $i = 0, 1, 2, \dots, \infty$. For purposes of simulation, the number of classes
 is truncated, with a maximum value of $k$. Transmissivity $(\lambda)$ and
-mortality $(\alpha)$ and are additive in these models, increasing linearly with
+mortality $(\alpha)$ are additive in these models, increasing linearly with
 $i$. Trees advance to the next disease class at rate $\Lambda$, the overall
 force of infection, which is the sum of each tree's contribution, $i\lambda$.
 Trees in each stage die at rate $d + i\alpha$. Here is the complete
@@ -189,10 +221,10 @@ referring to their values in each of the three models. I also use the term
 having at least one infection in the $SIV$ or multi-infection models.
 
 Multi-infection models typically assume a distribution of infections in order to
-reduce the system of equations [@Anderson1978]. Negative-binomial distributions
+reduce the infinite system of equations [@Anderson1978]. Negative-binomial distributions
 of infections allow tractable analysis of such models and match empirical
-studies of infection distribution in the wild [@Wilson2002]. However, the reduced model
-only approximates the full model asymptotically [@Adler1992], and key
+studies of infection distribution in the wild [@Wilson2002]. However,  reduced models
+only approximate the full model asymptotically and do not capture transient dynamics [@Adler1992], and key
 assumptions of the reduced model break down in the presence of age structure.
 Instead, I avoided making such assumptions by simulating the the
 infinite system of equations truncating at $k$.
@@ -200,11 +232,10 @@ infinite system of equations truncating at $k$.
 ### Comparative parameterization
 
 I compared the models' behaviors under "equivalent" parameterizations. As the
-models have different structures, their parameters in the models have different
+models have different structures, parameters in the models have different
 interpretations. Specifically, $\lambda$ and $\alpha$ operate on a
 per-individual basis in the $SI$ model, while they operate on a per-infection
-basis on the $SIV$ and multi-infection models. Thus, they are not *identical*
-parameterizations.
+basis on the $SIV$ and multi-infection models. 
 
 In order to determine equivalent parameterizations between models, I set
 parameters for the $SI$ model to those in Table 1. I then fit the $SIV$ and
@@ -212,9 +243,7 @@ multi-infection models so that they would exhibit identical *behavior* to the
 $SI$ model under different criteria. The behavior of SIV and multi-infection
 models were adjusted by multiplying both the infectivity
 $(\lambda_{SIV}, \lambda_{multi})$ and disease-induced mortality
-$(\alpha_{SIV}, \alpha_{multi})$ parameters by a constant $c$. Where there there
-were dual behavior criteria (behaviors (4) and (5) below), the $\lambda$ and
-$\alpha$ values were allowed to vary independently.
+$(\alpha_{SIV}, \alpha_{multi})$ parameters by a constant $c$.
 
 Initial conditions in simulations were set at the disease-free equilibrium of
 the system, modified with 1% of both juveniles and adults having a single
@@ -267,9 +296,9 @@ I examined model behavior in three cases.
     $$t\big|_{\frac{I}{S+I} = 0.1} = t\big|_{\frac{I+V}{S+I+V} = 0.1}
                             = t\big|_{\frac{N_{i \geq 1}}{N} = 0.1}$$
 
-All simulations simulations were performed in R [@RCORE], using the deSolve
-package (@deSolve) for simulation, the numDeriv package to determine derivatives
-(@numDeriv), and the ggplot2 (@ggplot2) package for plotting. Code to reproduce these
+All simulations were performed in R [@RCORE], using the deSolve
+package [@deSolve] for simulation, the numDeriv package to determine derivatives
+[@numDeriv], and the ggplot2 [@ggplot2] package for plotting. Code to reproduce these
 results is archived online [@Ross2014].
 
 Results

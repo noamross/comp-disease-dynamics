@@ -1,0 +1,40 @@
+---
+statement of authorship: NR performed all analyses and wrote the paper.
+title: 'Host-pathogen dynamics in fungal diseases: Comparing SI and multi-infection models'
+author: 
+  - name: Noam Ross
+    affiliation: UCD
+    email: nmross@ucdavis.edu
+    footnote: Corresponding author  
+address: 
+  - code: UCD
+    address: > 
+      Department of Environmental Science and Policy, University of California-Davis
+      1 Shields Avenue
+      Davis, CA 95616 USA
+running title: Comparative host-fungal disease dynamics
+keywords: fungal disease, parasites, plant pathogens, dynamics, transients, epidemics
+words in abstract: 148
+words in text: 3383
+figures: 5
+tables: 1
+text boxes: 0
+references: 30
+article type: letter
+abstract: |
+  Emerging fungal disease pose major threats to plants and wildlife. As effects of
+  many fungal diseases are load-dependent, they may be better represented by
+  models with variable loads (multi-infection), rather than susceptible-infected
+  (SI) models. I compare equilibrium and transient behavior between these model
+  types, including the dynamics of age structure. To compare models with different
+  structure, I parameterized multi-infection models to replicate SI behavior at
+  either initial or equilibrium phases of an epidemic, comparing the resultant
+  behavior at other phases. Multi-infection diseases have either slower initial
+  growth rates of disease than SI models, or have greater population-suppressing
+  effects. Multi-infection models also produce greater relative mortality in older
+  host stages, and greater overall changes in population age structure, than SI
+  models. These results indicate that using SI models to predict epidemic behavior
+  when diseases are load-dependent may underestimate long-term effects.
+
+---
+ 
