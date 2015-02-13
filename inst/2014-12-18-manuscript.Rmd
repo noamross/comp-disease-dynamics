@@ -49,7 +49,7 @@ abstract: |
   effects. Multi-infection models also produce greater relative mortality in older
   host stages, and greater overall changes in population age structure, than SI
   models. These results indicate that using SI models to predict epidemic behavior
-  when diseases are load-dependent may underestimate long-term effects.
+  when diseases are load-dependent may underestimate long-term effects. **effects of what type**
 ---
 
 ```{r get_chunks, echo=FALSE, results='hide', message=FALSE, warning=FALSE, cache=FALSE}
@@ -66,19 +66,98 @@ opts_chunk$set(echo=FALSE, cache=TRUE, message=FALSE, warning=FALSE)
 ```
 
 
+General comments
+------------
+
+This is an interesting comparative study of multi-infection models
+(more on this terminology below) versus SI models, motivated by fungal
+disease. The paper argues that multi-infection models are better
+representations of fungal diseases than the SI models often used in
+the literature. The main focus is demonstrating consequences of
+misclassifying dynamics as SI when a process is multi-infection (or
+vice versa), with a secondary focus on generation of age-dependent
+effects in multi-infection models.  To explore these issues, the paper
+sets up several mathematical models, then uses numerical simulation to
+explore their full dynamics. The paper has nice exposition of the
+matematical models, and is well-motivated by a biological question.
+
+My overall reactions:
+
+**Transient vs equilibrium differences in behavior-- focus on mortality rate**
+
+The quantitative effects on population numbers shown as consquences
+of misclassifying dynamics as SI when the are multi-infection (ie Fig
+1, 4, 5) seem small for (5 % adult abundance). If maintaining any
+metion of these effects on abundance, then need to make better case
+for why they matter. However, the change in mortality seems larger,
+more meaningful, and related to age-specific patterns in mortality
+that I think are more interesting. I would:
+
+* eliminate one of the initial conditions conditions as they seem the same (mention it, put figures in supplement)
+* eliminate the infected hosts and host population panels, making the mortality transient a two panel figure depending on the initial-conditions or equlibirium conditions parameterization
+
+
+**Focus the paper on this: Multi-infection models generate age-dependent effects not found in SI models.**
+
+I found this section much more potentially interesting. But here, the
+graphics are much less illustrative. To me, the main idea stated in
+the discussion is compelling (is it novel?):
+
+> Multiple-infection models indicate that age- or stage-related
+patterns in disease mortality can arise from the accumulation of
+infections over time, even in the absence of biological differences
+among age class in susceptibility to disease.
+
+So even in a trivial model of age strucure these age-dependent
+differnences in distribution can drive differneces in observed mortality.
+Cool stuff. But, need to show it better graphically. Some ideas:
+
+* for SIV: stacked bar chart at 2-3 time points, or stacked ribbon plot over timeseries
+* for multi: density plots at several time points or for the whole series
+* **actual plots of the mortality**
+
+Caveats/concerns:
+
+* Even with this focus I'm skeptical about the mortality transient being interesting. At the very least the transient provides a nice illustration of the point you raise at the end of discussion -- that changes in mortality rate are necessary (not sufficient) indicators of these dynamics
+* If the goal is to discuss dangers of misdetection at equlibirium vs initial phase of establishment, why not take a data-simulation + model fitting approach (with power analysis / ROC, etc)?
+
+Terminology:
+* describing  structured models as null seems correct, but atypical in my expereince 
+* terming AM type macroparisite models as "multi-infection models" is
+  sensible given goals of this paper, but risks confusion with ideas
+  of multiple-infection in epidemiology (which refers to multiple
+  strains). What to Duerr, Krasnov or Pacala & Dobson call these?
+
+Figs:
+* more descriptive captions!
+* change the linetype to key off model type since that is the main comparison
+* also it's confusing to have order (from light to dark) SIV, SI, multi but this would disappear if omitting figure legends and describe linetype meanings in caption
+* better infection plots to show age-dependent effects
+* time to 10 % == equivalent initial so put one in the supplement 
+
+Structure:
+* final p'graph of intro would be stronger if stating concretely the questions examined. (Some give away the results at this point too.)
+* first p'graph of discussion should state concretely the most interesting finding
+
+
+Minutae:
+1. avoid using _italics_ for emphasis -- some jounals don't allow them and they're arguably a crutch that avoids structural and syntactic methods to emphasize key points
+2. grammar /typo/spell check needed
+
+
 Introduction
 ------------
 
 Emerging fungal infections pose major threats to plant and animal wildlife
-populations as well has livestock and crops. Fungal life-history traits, including high
+populations as well as livestock and crops. Fungal life-history traits, including high
 virulence, long-lived environmental reservoirs, and host generalism are thought
 to contribute to the potential of these pathogens to drive local and global
 extinctions of some species [@Fisher2012; @Eskew2013]. Oomycetes, a taxonomically distinct 
-group from fungi that nonetheless many of these traits, pose similar threats.
+group from fungi that possess many of these same traits, pose similar threats.
 
 An important component of fungal host-pathogen dynamics is the role of spore load
 in driving host infection and mortality. @Briggs2010 showed that
-population-level persistence or extinction of mountain yellow-legged frogs (*R.
+population-level persistence or extinction of mountain yellow-legged frogs (*Rana
 sierrae*) infected by chytrid fungus (*Batrachochytrium dendrobatidis*), could
 be explained by the dynamics of spore load build-up in these populations.
 Similarly, mortality of bat populations
@@ -99,11 +178,13 @@ component of plant disease dynamics [@Waggoner1981; @Dobson1994;
 kills tanoak (*Notholithocarpus densiflorus*) faster in the presence of large
 numbers of other infected hosts, indicating that continued accumulation of
 infections, rather than just disease progress, drives mortality [@Cobb2012].
+**This paragraph seems thin, maybe add some theoretical component or join with next p'graph**
 
 Most attempts to model fungal disease dynamics have used traditional susceptible-infected (*SI*) disease frameworks, which represent
-disease as a binary state of the host [@Kermack1927]. Extensions such as
+disease as a binary state of the host [@Kermack1927]. **Need some citations to back this up, examples of these "most attempts"**
+Extensions such as
 susceptible-exposed-infected-removed (*SEIR*) models represent disease
-progression within hosts, but do not capture the accumulation of *new*
+progression within hosts, but do not capture the accumulation of new **avoid italics for emphasis**
 infections in hosts that may drive disease impacts. This dynamic may be better captured
 using the framework created by @Anderson1978 to model macroparasite infections,
 where disease is represented by the number of discrete infections (or
@@ -131,12 +212,12 @@ host-pathogen dynamics.
 There is a considerable literature on host-pathogen dynamics of in age- and
 stage-structured populations using *SI* models [@CastilloChavez1989; @Busenberg1990; @Diekmann1990; @Hethcote2000;
 @Dietz2002; @Klepac2010]. There is a somewhat
-smaller literature on age structure in multi-infecton models. In
+smaller literature on age structure in multi-infectoin models. **run spellcheck** In
 multi-infection models, @Krasnov2006 showed that parasite counts increase with
 age in rodents. @Pacala1988 created a method to detect the mortality effect of
 macroparasites based of the distribution of parasites among different age
-groups. @Duerr2003 showed how a age-infection relationships could be modified by
-a variety of age- time- and density-dependent processes, but also showed that
+groups. @Duerr2003 showed how age-infection relationships could be modified by
+a variety of age, time, and density-dependent processes, but also showed that
 interpretation of such age-infection patterns was ambiguous if more than one
 such process was operating.
 
@@ -148,19 +229,21 @@ I examine how *SI* and multi-infection models differ
 in long-term dynamics when parameterized to fit identical short-term conditions,
 and vice versa. I also explore how patterns of disease across life stages differ
 between over the course of epidemics in *SI* and multi-infection models.
+**State the exploration as a concrete question**
+**OPtional: give away the results**
 
 Methods
 -------
 
 ### Model Structure
 
-I compared dynamics in 3 ODE-based disease models: A simple $SI$ model, a
+I compared dynamics in 3 ODE disease models: A simple $SI$ model, a
 multi-infection model based on @Anderson1978, and an intermediate $SIV$
 (susceptible-infected-*very* infected) model.
 
 Each model has a two-stage population structure (population $N$ = juveniles
 $J$ + adults $A$). New individuals enter the uninfected, juvenile stage via
-density-dependent recruitment ($fN(1-N/K)$, where $f$ is fecunidity and $K$
+density-dependent recruitment ($fN(1-N/K)$, where $f$ is fecundity and $K$
 carrying capacity). Individuals move from juvenile to adult classes at the
 transition rate $g$.
 
@@ -182,7 +265,8 @@ $$\begin{aligned}
   N &= J_S + A_S + J_I + A_I
 \end{aligned}$$
 
-Note that this is a *null model* of age structure; neither demographic nor
+**While techinically correct, this isn't a typical use of the term null model, at least in ecology. I would say it like:**
+Note that in this model the effect of age structure is trivial: neither demographic nor
 epidemiological parameters vary with age. When juvenile and adult classes are
 summed, the growth term $g$ drops out, and $dN/dt$ is independent of $g$.
 
@@ -192,7 +276,7 @@ are an infinite number of disease classes designated
 $i = 0, 1, 2, \dots, \infty$. For purposes of simulation, the number of classes
 is truncated, with a maximum value of $k$. Transmissivity $(\lambda)$ and
 mortality $(\alpha)$ are additive in these models, increasing linearly with
-$i$. Trees advance to the next disease class at rate $\Lambda$, the overall
+$i$. Trees **trees?** advance to the next disease class at rate $\Lambda$, the overall
 force of infection, which is the sum of each tree's contribution, $i\lambda$.
 Trees in each stage die at rate $d + i\alpha$. Here is the complete
 multi-infection model:
@@ -215,7 +299,7 @@ $k = 2$. For this model I refer $N_0$ as $S$, $N_1$ as $I$ and $N_2$ as $V$, and
 use $S$, $I$, and $V$, as subscripts for $J$, and $A$ as well.
 
 In this paper, parameters (e.g., $\lambda$ and $\alpha$) are subscripted with
-$\text{param}_{SI}$, $\text{param}_{SIV}$, or $\text{param}_\text{multi}$ when
+$\text{param}_{SI}$, $\text{param}_{SIV}$, or $\text{param}_\text{multi}$ **seems like a non-standard way-- just say subscripted with $SI$ etc** when
 referring to their values in each of the three models. I also use the term
 "infected" to refer to individuals of either the $I$ class in the $SI$ model, or
 having at least one infection in the $SIV$ or multi-infection models.
@@ -225,13 +309,13 @@ reduce the infinite system of equations [@Anderson1978]. Negative-binomial distr
 of infections allow tractable analysis of such models and match empirical
 studies of infection distribution in the wild [@Wilson2002]. However,  reduced models
 only approximate the full model asymptotically and do not capture transient dynamics [@Adler1992], and key
-assumptions of the reduced model break down in the presence of age structure.
+assumptions of the reduced model break down in the presence of age structure. **Which key assumptions? Concisely state here (if not obvious can cite your unpublished calculations that lead to this?)**
 Instead, I avoided making such assumptions by simulating the the
-infinite system of equations truncating at $k$.
+infinite system of equations truncating at $k$. **I'd like more detail here -- you simulate $2k$ equations but encode a rule to increase $k$ can increase?**
 
 ### Comparative parameterization
 
-I compared the models' behaviors under "equivalent" parameterizations. As the
+I compared the models' behaviors under parameterizations determined "equivalent" by one of three of heuristic criteria described below. As the
 models have different structures, parameters in the models have different
 interpretations. Specifically, $\lambda$ and $\alpha$ operate on a
 per-individual basis in the $SI$ model, while they operate on a per-infection
@@ -244,6 +328,7 @@ $SI$ model under different criteria. The behavior of SIV and multi-infection
 models were adjusted by multiplying both the infectivity
 $(\lambda_{SIV}, \lambda_{multi})$ and disease-induced mortality
 $(\alpha_{SIV}, \alpha_{multi})$ parameters by a constant $c$.
+**Unclear if there is 1, 2 or 4 constants. Below it seems there is one constant per model, so $c_SIV$ and $c_multi$**
 
 Initial conditions in simulations were set at the disease-free equilibrium of
 the system, modified with 1% of both juveniles and adults having a single
@@ -261,7 +346,7 @@ infection.
 
 Table 1: Base parameters for disease models
 
-I examined model behavior in three cases.
+I examined model behavior in three cases. In each case using a different criterion to define equivalent parameterization:
 
 1.  **Equilibrium mortality rate**. The first behavioral criterion was identical
     equilibrium mortality rate across models. $c$ was varied to match the
@@ -285,7 +370,7 @@ I examined model behavior in three cases.
     $I_{SIV} = N_{i \geq 2\, multi} = 0$.
 
     Note that the first condition, of the initial growth rate of infected
-    individuals, is identical at all cases under these initial conditions. Thus,
+    individuals, is identical at all cases under these initial conditions. **Omit the first condition or state is in text rather than display equation (since it's trivial)** Thus,
     I used only the second derivative to fit parameter values.
 
 3.  **Time to 10% infection**. This criterion was selected to match behavior
@@ -312,8 +397,10 @@ Results
 
 ### Aggregate dynamics
 
-**Models with similar equilibrium behavior differ in initial transient
-behavior**. Figure 1 shows the dynamic behavior of the $SI$, $SIV$, and
+**Refocus: Pattern of mortality rate over time in epidemic**
+
+**Models with similar equilibrium mortality rate differ in initial transient
+mortality rate**. Figure 1 shows the dynamic behavior of the $SI$, $SIV$, and
 multi-infection models calibrated to equivalent mortality at equilibrium. Under
 this parameterization, all models reach an internal equilibrium with a
 population level suppressed from the disease-free equilibrium at which they
@@ -325,7 +412,11 @@ the models $(c)$ is the inverse of the mean number of infections at equilibrium
 in the $SIV$ and multi-infection models. This value is `r round(mod_SIV, 2)` for
 the SIV model and `r round(mod_multi, 2)` for the multi-infection model.
 
+**Need descriptive figure captions -- include meanings of lines, axes etc.
+Also  differences between SI, SIV, multi this would be clearer if linetype was keyed to model**
+
 ```{r Fig1, fig.cap="Dynamics of models parameterized to equivalent equilibrium mortality rates"}
+
 <<equiv_equilib>>
 equiv_equilib_comp_plot
 ```
@@ -343,6 +434,8 @@ through the population in the $SIV$ model, the proportion of individuals in the
 $I$ and $V$ classes increases for both juveniles and adults. Similarly, in the
 multi-infection model, the mean number of infections in each individual
 increases over time, increasing the mortality rate.
+
+**Fig 2 shows multi and Fig 3 shows SIV in the pdf. The point is to show the number of individuals in the more-infected classes increases over time in both models. This should probably be one figure  **
 
 ```{r Fig2, fig.cap="Dynamics infection classes in the SIV model"}
 <<progplot>>
@@ -362,7 +455,7 @@ multi-infection model, for the disease to emerge.
 ```{r modparms2}
 ```
 
-**Models with similar initial behavior reach different equilibrium conditions.**
+**Models with similar initial mortality rate reach different equilibrium mortality rates.**
 Figure 4 shows the dynamics of the three models in the case where the initial
 first and second derivatives are equivalent. As in the matching-equilibrium
 parameterizations, mortality for infected individuals increases over time until
@@ -393,7 +486,7 @@ init_derivs_comp_plot
 ```
 
 Figure 5 shows model dynamics when models were parameterized to have equivalent
-timeuntil 10% of the total population was infected. As with the last
+time until 10% of the total population was infected. As with the last
 parameterization, the initial mortality rates of the $SIV$ and multi-infection
 models are similar to those in the $SI$ model; per-infection parameters in
 $SIV$/multi-infection models are similar to per-individual parameters in the
@@ -438,6 +531,7 @@ greater in the $SIV$ and multi-infection models than the $SI$ model. at
 equilibrium, there are more juveniles and fewer adults in the
 $SIV$/multi-infection cases.
 
+**As stated elsewhere, I think this effect of age-dependent infection in influcing mortality rates is the most generally interesting aspect of this work. However, fig 2 and 3 aren't very good graphics to illustrate this point. Rather, they most clearly show that the there are greater proportions of more-infected individuals (in all age classes) as the disease establishes. Secondarily, one can notice that the proportion is higher in adults. It might be better to show this latter point more clearly, eg by comparing two time points with stacked bar chart. Also, a figure that shows these mortality effects is needed (and should be a simple transformation of the data underlying these figures, given parameters d and alpha)**
 In the $SIV$ and multi-infection models, the mortality rate of infected
 juveniles and adults increases as the disease progresses, and their mortality
 rate diverges, with adults having greater mortality rates than juveniles at
@@ -468,7 +562,7 @@ $SI$ model, these differences do not arise.
 Discussion
 ----------
 
-$SI$ and multi-infection models represent disease different ways: as binary
+$SI$ and multi-infection models represent disease differently: as binary
 states of an individual, or as accumulations of multiple infections across
 individuals. As a result, they may produce different host-pathogen dynamics. The
 choice of model structure has important consequences for the prediction of
@@ -488,9 +582,10 @@ be lower as highly infected individuals suppressing population more. A *smaller*
 fraction of the population will be infected at equilibrium, because of the short
 survival of highly infected individuals.
 
-I found similar patterns in the reverse case, where early disease behavior was
+** Clarify this sentence: state concretely what the similar patterns are**
+**I found similar patterns in the reverse case, where early disease behavior was
 predicted from equilibrium behavior using both $SI$ and multiple-infection
-models. Multiple-infection models with the same equilibrium behavior as $SI$
+models.** Multiple-infection models with the same equilibrium behavior as $SI$
 models are slower to emerge, as the small numbers of infections on initially
 infected individuals transmit less disease and kill at slower rates than "fully"
 infected individuals in the $SI$ model, which have higher per-individual
@@ -498,16 +593,18 @@ transmission mortality. The models converge when mean infection numbers in
 individuals in the multi-infection model rise such that their virulence matches
 individuals in the $SI$ model.
 
-Multiple-infection models indicate that age- or stage-related patterns in
+**I see the  phrase I've bolded below as encapsulating your most potentially interesting ecological finding. Is it novel?**
+
+**Multiple-infection models indicate that age- or stage-related patterns in
 disease mortality can arise from the accumulation of infections over time, even
 in the absence of biological differences among age class in susceptibility to
-disease. Here I found that, in all parameterizations of multi-infection models,
+disease.** Here I found that, in all parameterizations of multi-infection models,
 adult mortality rates increased faster than juvenile mortality rates as
 epidemics progressed, even though per-infection mortality rates were identical
 between life stages. While in some fungal diseases, host-pathogen interactions
 drive differences in virulence between life stages (e.g., chytrid fungus, see
 @Rachowicz2004), this difference could explain part or all of stage-related
-differences in mortality in fungal diseases, such as in Sudden Oak Death
+differences in mortality in other fungal diseases, such as in Sudden Oak Death
 [@Cobb2012].
 
 Multiple infection-models also showed increase population-level age effects of
@@ -529,7 +626,7 @@ time-to-10%-infection parameterization, indicating a role of the long tail of
 hosts with high infection number in driving this pattern.
 
 These results indicate that identifying multi-infection driven diseases early in
-their emergence will significantly alter predictions of disease dynamics. Can
+their emergence will **significantly** (Biologically significant?) alter predictions of disease dynamics. Can
 the dynamics of these disease be distinguished from those of $SI$-like processes
 in the data from early-stage emerging epidemics, especially when data are of
 disease prevalence rather than load? One way to distinguish these mechanisms is
@@ -538,7 +635,7 @@ late-epidemic populations, or to look for differences in mortality rate among ag
 classes. Both these patterns can indicate multi-infection-driven processes, though such patterns are not
 sufficient to disentangle the multiple processes that may drive mortality
 patterns. Instead, these patterns can indicate the potential role of these mechanisms,
-and the need to investigte the relationships between infection load and host
+and the need to investigate the relationships between infection load and host
 effects.
 
 <!-- 
