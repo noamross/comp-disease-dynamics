@@ -8,6 +8,14 @@ author:
   name: Noam Ross
 date: "December 18, 2014"
 output:
+  html_document:
+    dev:
+    - svg
+    - png
+    fig_caption: yes
+    fig_height: 6
+    fig_width: 12
+    keep_md: yes
   pdf_document:
     dev:
     - cairo_pdf
@@ -17,14 +25,6 @@ output:
     fig_width: 12
     keep_tex: yes
     template: elsarticle.latex
-  html_document:
-    dev:
-    - svg
-    - png
-    fig_caption: yes
-    fig_height: 6
-    fig_width: 12
-    keep_md: yes
 csl: ecology-letters.csl
 address:
 - address: |
