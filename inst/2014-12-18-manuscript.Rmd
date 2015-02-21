@@ -2,36 +2,51 @@
 title: 'Host-pathogen dynamics in fungal diseases: Comparing SI and multi-infection
   models'
 author:
-- affiliation: UCD
-  email: nmross\@ucdavis.edu
-  footnote: Corresponding author
-  name: Noam Ross
+- affiliation:
+  - UCD
+  email:
+  - nmross\@ucdavis.edu
+  footnote:
+  - Corresponding author
+  name:
+  - Noam Ross
 date: "December 18, 2014"
 output:
-  pdf_document:
-    dev:
-    - cairo_pdf
-    - cairo_ps
-    fig_caption: yes
-    fig_height: 6
-    fig_width: 12
-    keep_tex: yes
-    template: elsarticle.latex
   html_document:
     dev:
     - svg
     - png
-    fig_caption: yes
-    fig_height: 6
-    fig_width: 12
-    keep_md: yes
+    fig_caption:
+    - yes
+    fig_height:
+    - 6
+    fig_width:
+    - 12
+    keep_md:
+    - yes
+  pdf_document:
+    dev:
+    - cairo_pdf
+    - cairo_ps
+    fig_caption:
+    - yes
+    fig_height:
+    - 6
+    fig_width:
+    - 12
+    keep_tex:
+    - yes
+    template:
+    - elsarticle.latex
 csl: ecology-letters.csl
 address:
-- address: |
+- address:
+  - |
     Department of Environmental Science and Policy
     University of California-Davis
     1 Shields Avenue Davis, CA 95616 USA
-  code: UCD
+  code:
+  - UCD
 documentclass: elsarticle
 layout: review,12pt
 linenumbers: yes
@@ -49,7 +64,8 @@ abstract: |
   effects. Multi-infection models also produce greater relative mortality in older
   host stages, and greater overall changes in population age structure, than SI
   models. These results indicate that using SI models to predict epidemic behavior
-  when diseases are load-dependent may underestimate long-term effects. **effects of what type**
+  when diseases are load-dependent may underestimate long-term effects on population
+  size.
 ---
 
 ```{r get_chunks, echo=FALSE, results='hide', message=FALSE, warning=FALSE, cache=FALSE}
@@ -89,22 +105,16 @@ interfere with cell metabolism [@Hall2009b]. Many mammals, including humans,
 which are generally resistant to fungal diseases or asymptotic under normal
 conditions may nonetheless become infected and exhibit symptoms or mortality
 under persistent exposure to large fungal spore loads [@Casadevall2005].
-
-Accumulation of local infections, rather
-than systemic infections, has long been recognized as an important
-component of plant disease dynamics [@Waggoner1981; @Dobson1994;
-@McRoberts2003], especially in cases of parasitic plants such as mistletoe
-[@Martinez1996]. Sudden Oak Death, caused by the oomycete *Phyophthora ramorum*,
+Sudden Oak Death, caused by the oomycete *Phyophthora ramorum*,
 kills tanoak (*Notholithocarpus densiflorus*) faster in the presence of large
 numbers of other infected hosts, indicating that continued accumulation of
 infections, rather than just disease progress, drives mortality [@Cobb2012].
-**This paragraph seems thin, maybe add some theoretical component or join with next p'graph**
 
-Most attempts to model fungal disease dynamics have used traditional susceptible-infected (*SI*) disease frameworks, which represent
-disease as a binary state of the host [@Kermack1927]. **Need some citations to back this up, examples of these "most attempts"**
+Many attempts to model fungal disease dynamics have used traditional susceptible-infected (*SI*) disease frameworks, which represent
+disease as a binary state of the host [@Kermack1927; @Briggs2005; @Mitchell2008; @Meentemeyer2011; @Foley2011a; @Maher2012;  @Cobb2012; @ORegan2014]
 Extensions such as
 susceptible-exposed-infected-removed (*SEIR*) models represent disease
-progression within hosts, but do not capture the accumulation of new **avoid italics for emphasis**
+progression within hosts, but do not capture the accumulation of new 
 infections in hosts that may drive disease impacts. This dynamic may be better captured
 using the framework created by @Anderson1978 to model macroparasite infections,
 where disease is represented by the number of discrete infections (or
@@ -132,7 +142,7 @@ host-pathogen dynamics.
 There is a considerable literature on host-pathogen dynamics of in age- and
 stage-structured populations using *SI* models [@CastilloChavez1989; @Busenberg1990; @Diekmann1990; @Hethcote2000;
 @Dietz2002; @Klepac2010]. There is a somewhat
-smaller literature on age structure in multi-infectoin models. **run spellcheck** In
+smaller literature on age structure in multi-infection models. In
 multi-infection models, @Krasnov2006 showed that parasite counts increase with
 age in rodents. @Pacala1988 created a method to detect the mortality effect of
 macroparasites based of the distribution of parasites among different age
@@ -185,10 +195,10 @@ $$\begin{aligned}
   N &= J_S + A_S + J_I + A_I
 \end{aligned}$$
 
-**While techinically correct, this isn't a typical use of the term null model, at least in ecology. I would say it like:**
 Note that in this model the effect of age structure is trivial: neither demographic nor
 epidemiological parameters vary with age. When juvenile and adult classes are
-summed, the growth term $g$ drops out, and $dN/dt$ is independent of $g$.
+summed, the growth term $g$ drops out, and $dN/dt$ is independent of $g$. Thus,
+it is a "null model" for age effects.
 
 The other two models are extensions of the $SI$ model with additional disease
 classes representing degrees of infection. In the multi-infection model, there
@@ -196,9 +206,9 @@ are an infinite number of disease classes designated
 $i = 0, 1, 2, \dots, \infty$. For purposes of simulation, the number of classes
 is truncated, with a maximum value of $k$. Transmissivity $(\lambda)$ and
 mortality $(\alpha)$ are additive in these models, increasing linearly with
-$i$. Trees **trees?** advance to the next disease class at rate $\Lambda$, the overall
+$i$. Invividuals advance to the next disease class at rate $\Lambda$, the overall
 force of infection, which is the sum of each tree's contribution, $i\lambda$.
-Trees in each stage die at rate $d + i\alpha$. Here is the complete
+Individuals in each stage die at rate $d + i\alpha$. Here is the complete
 multi-infection model:
 
 $$\begin{aligned}
@@ -219,7 +229,7 @@ $k = 2$. For this model I refer $N_0$ as $S$, $N_1$ as $I$ and $N_2$ as $V$, and
 use $S$, $I$, and $V$, as subscripts for $J$, and $A$ as well.
 
 In this paper, parameters (e.g., $\lambda$ and $\alpha$) are subscripted with
-$\text{param}_{SI}$, $\text{param}_{SIV}$, or $\text{param}_\text{multi}$ **seems like a non-standard way-- just say subscripted with $SI$ etc** when
+$\text{param}_{SI}$, $\text{param}_{SIV}$, or $\text{param}_\text{multi}$ when
 referring to their values in each of the three models. I also use the term
 "infected" to refer to individuals of either the $I$ class in the $SI$ model, or
 having at least one infection in the $SIV$ or multi-infection models.
@@ -228,8 +238,7 @@ Multi-infection models typically assume a distribution of infections in order to
 reduce the infinite system of equations [@Anderson1978]. Negative-binomial distributions
 of infections allow tractable analysis of such models and match empirical
 studies of infection distribution in the wild [@Wilson2002]. However,  reduced models
-only approximate the full model asymptotically and do not capture transient dynamics [@Adler1992], and key
-assumptions of the reduced model break down in the presence of age structure. **Which key assumptions? Concisely state here (if not obvious can cite your unpublished calculations that lead to this?)**
+only approximate the full model asymptotically and do not capture transient dynamics [@Adler1992], and the assumption of a negative-binomial distribution does not hold in the presence of age structure. (See Appendix A).
 Instead, I avoided making such assumptions by simulating the the
 infinite system of equations truncating at $k$. **I'd like more detail here -- you simulate $2k$ equations but encode a rule to increase $k$ can increase?**
 
@@ -245,10 +254,8 @@ In order to determine equivalent parameterizations between models, I set
 parameters for the $SI$ model to those in Table 1. I then fit the $SIV$ and
 multi-infection models so that they would exhibit identical *behavior* to the
 $SI$ model under different criteria. The behavior of SIV and multi-infection
-models were adjusted by multiplying both the infectivity
-$(\lambda_{SIV}, \lambda_{multi})$ and disease-induced mortality
-$(\alpha_{SIV}, \alpha_{multi})$ parameters by a constant $c$.
-**Unclear if there is 1, 2 or 4 constants. Below it seems there is one constant per model, so $c_SIV$ and $c_multi$**
+models were adjusted by multiplying each of infectivity and disease-induced mortality
+$(\lambda, \alpha)$ parameters by a constant, $c$.
 
 Initial conditions in simulations were set at the disease-free equilibrium of
 the system, modified with 1% of both juveniles and adults having a single
@@ -277,21 +284,14 @@ I examined model behavior in three cases. In each case using a different criteri
               = \alpha_\text{multi} \frac{1}{N} \sum_i i N_i$$
 
 2.  **Initial growth and acceleration rates of infected individuals.** Next, $c$
-    was adjusted such that the first and second derivatives of growth of total
-    infected individuals under initial conditions. That is,
+    was adjusted such that the second derivatives of growth of total
+    infected individuals under initial conditions. (The first derivative is
+    identical in all cases.) That is,
 
-    $$\begin{aligned}
-                \frac{dI}{dt}      &= \frac{d(I+V)}{dt} 
-                                    = \frac{dN_{i > 0}}{dt} \text{, and} \\
-                \frac{d^2 I}{dt^2} &= \frac{d^2(I+V)}{dt^2}
-                                    = \frac{d^2 N_{i > 0}}{dt^2}
-        \end{aligned}$$ at initial conditions of $S \approx N$,
+    $$\frac{d^2 I}{dt^2} = \frac{d^2(I+V)}{dt^2} = \frac{d^2 N_{i > 0}}{dt^2}$$
+    at initial conditions of $S \approx N$,
     $I_{SI} = I_{SIV} = N_{1\, multi} \approx 0$ and
     $I_{SIV} = N_{i \geq 2\, multi} = 0$.
-
-    Note that the first condition, of the initial growth rate of infected
-    individuals, is identical at all cases under these initial conditions. **Omit the first condition or state is in text rather than display equation (since it's trivial)** Thus,
-    I used only the second derivative to fit parameter values.
 
 3.  **Time to 10% infection**. This criterion was selected to match behavior
     among models during the early transient period of disease. $c$ was adjusted

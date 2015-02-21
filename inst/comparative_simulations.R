@@ -43,7 +43,7 @@ df = data.frame(subset(multisf, time %in% times))
 df = subset(df, SizeClass != "Total" & Population > 1e-5)
 df = df[order(df$time),]
 df$time = factor(paste("Time =", df$time), levels = paste("Time =", unique(df$time)))
-progplot_SIV =ggplot(df, aes(x=Infected, y=Population, fill=SizeClass)) + 
+progplot_multi =ggplot(df, aes(x=Infected, y=Population, fill=SizeClass)) + 
   geom_area(position="identity", alpha = 0.5) +
   scale_fill_grey(labels = c("Juveniles", "Adults")) +
   theme_nr +
@@ -55,7 +55,7 @@ df2 = data.frame(subset(SIVsf, time %in% times))
 df2 = droplevels(subset(df2, SizeClass != "Total" & Population > 1e-5))
 df2 = df2[order(df2$time),]
 df2$time = factor(paste("Time =", df2$time), levels = paste("Time =", unique(df2$time)))
-progplot_multi = ggplot(df2, aes(x=as.factor(Infected), y=Population, fill=SizeClass)) + 
+progplot_SIV = ggplot(df2, aes(x=as.factor(Infected), y=Population, fill=SizeClass)) + 
   geom_bar(stat="identity", position="dodge", alpha = 0.5) +
   scale_fill_grey(labels = c("Juveniles", "Adults")) +
   scale_x_discrete(labels = c("S", "I", "V")) +
