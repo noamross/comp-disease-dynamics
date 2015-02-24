@@ -1,85 +1,9 @@
----
-title: 'Host-pathogen dynamics in fungal diseases: Comparing SI and multi-infection
-  models'
-author:
-- affiliation:
-  - UCD
-  email:
-  - nmross\@ucdavis.edu
-  footnote:
-  - Corresponding author
-  name:
-  - Noam Ross
-date: "December 18, 2014"
-output:
-  html_document:
-    dev:
-    - svg
-    - png
-    fig_caption:
-    - yes
-    fig_height:
-    - 6
-    fig_width:
-    - 12
-    keep_md:
-    - yes
-  pdf_document:
-    dev:
-    - cairo_pdf
-    - cairo_ps
-    fig_caption:
-    - yes
-    fig_height:
-    - 6
-    fig_width:
-    - 12
-    keep_tex:
-    - yes
-    template:
-    - elsarticle.latex
-csl: ecology-letters.csl
-address:
-- address:
-  - |
-    Department of Environmental Science and Policy
-    University of California-Davis
-    1 Shields Avenue Davis, CA 95616 USA
-  code:
-  - UCD
-documentclass: elsarticle
-layout: review,12pt
-linenumbers: yes
-bibliography: references.bib
-abstract: |
-  Emerging fungal disease pose major threats to plants and wildlife. As effects of
-  many fungal diseases are load-dependent, they may be better represented by
-  models with variable loads (multi-infection), rather than susceptible-infected
-  (SI) models. I compare equilibrium and transient behavior between these model
-  types, including the dynamics of age structure. To compare models with different
-  structure, I parameterized multi-infection models to replicate SI behavior at
-  either initial or equilibrium phases of an epidemic, comparing the resultant
-  behavior at other phases. Multi-infection diseases have either slower initial
-  growth rates of disease than SI models, or have greater population-suppressing
-  effects. Multi-infection models also produce greater relative mortality in older
-  host stages, and greater overall changes in population age structure, than SI
-  models. These results indicate that using SI models to predict epidemic behavior
-  when diseases are load-dependent may underestimate long-term effects on population
-  size.
----
+# Host-pathogen dynamics in fungal diseases: Comparing SI and multi-infection models
+December 18, 2014  
 
-```{r get_chunks, echo=FALSE, results='hide', message=FALSE, warning=FALSE, cache=FALSE}
-library(knitr)
-read_chunk('base_parms.R')
-read_chunk('comparative_simulations.R')
-opts_knit$set(eval.after = "fig.cap")
-opts_chunk$set(echo=FALSE, cache=TRUE, message=FALSE, warning=FALSE)
-```
 
-```{r setup}
-<<setparms>>
-<<load_pkgs_code>>
-```
+
+
 
 Introduction
 ------------
@@ -309,25 +233,21 @@ results is archived online [@Ross2014].
 Results
 -------
 
-```{r base_models}
-```
 
-```{r modparms}
-```
-```{r modparms2}
-```
 
-```{r modparms3}
-```
+
+
+
+
 
 ### Parameterizations
 
 For the equilibrium parameterization, the constant $c$, or the ratio of $\alpha$ and $\lambda$ values between
 the models, is the inverse of the mean number of infections at equilibrium
-in the $SIV$ and multi-infection models. This is `r round(mod_SIV, 2)` for
-the SIV model and `r round(mod_multi, 2)` for the multi-infection model. For the
-acceleration-rate parameterization, $c$ was `r round(mod_SIV2, 2)` for both $SIV$ and multi-infection
-models.  For the time-to-10% infection parameterization, $c$ was was `r round(mod_SIV3, 2)` for both models.
+in the $SIV$ and multi-infection models. This is 0.69 for
+the SIV model and 0.61 for the multi-infection model. For the
+acceleration-rate parameterization, $c$ was 0.99 for both $SIV$ and multi-infection
+models.  For the time-to-10% infection parameterization, $c$ was was 0.98 for both models.
 Results for both accelleration and time-to-10% infection parameterizations were
 nearly identical (See Appendix), so I report only the equilibrium and time-to-10% results in
 the sections below.
@@ -339,10 +259,7 @@ other times.**  Mortality rates of infected individuals in both the $SIV$ and
 multi-infection models evolve over time while in the $SI$ model they are constant
 (Figure 1).
 
-```{r Fig2, fig.cap="Changes in mortality rates"}
-<<mortrateplot>>
-mort_rate_comp_plot
-```
+![Changes in mortality rates](2014-12-18-manuscript_files/figure-html/Fig2-1.png) 
 
 
 ### Population effects
@@ -370,9 +287,7 @@ infected stage reaching a peak before equilibrium and the juvenile infected
 stage reaching a smaller equilibrium with no peak.
 
 
-```{r Fig3, fig.cap="Dynamics of infection classes in the multi-infection model"}
-progplot_multi
-```
+![Dynamics of infection classes in the multi-infection model](2014-12-18-manuscript_files/figure-html/Fig3-1.png) 
 
 While equilibrium behaviors are identical and models start at the same initial
 conditions, transient behavior differs. The time to equilibrium is greater in
@@ -380,11 +295,7 @@ the multi-infection model than the $SIV$ model, and greater in both than the
 $SI$ model. It takes longer in the $SIV$ model, and longest in the
 multi-infection model, for the disease to emerge.
 
-```{r Fig1, fig.cap="Host population dynamics"}
-
-<<popplot>>
-population_comp_plot
-```
+![Host population dynamics](2014-12-18-manuscript_files/figure-html/Fig1-1.png) 
 
 
 **Models with similar initial mortality rate reach different equilibrium mortality rates.**
@@ -393,8 +304,8 @@ first and second derivatives are equivalent. As in the matching-equilibrium
 parameterizations, mortality for infected individuals increases over time until
 equilibrium is reached. Unlike that parameterization, per-infection parameters
 in the $SIV$/multi-infection models (mortality and infectivity), are similar to
-per-individual parameters in the $SI$ model. $c$ is `r round(mod_SIV, 2)` for
-the SIV model and `r round(mod_multi, 2)` for the multi-infection model. Total
+per-individual parameters in the $SI$ model. $c$ is 0.69 for
+the SIV model and 0.61 for the multi-infection model. Total
 mortality rates for the $SIV$ and multi-infection models start at the same
 levels as the $SI$ model and diverge over time.
 
@@ -409,16 +320,10 @@ model.
 
 
 
-```{r Fig4, fig.cap="Dynamics of models parameterized to equivalent initial rates of growth of infectious individuals"}
-<<init_derivs>>
-init_derivs_comp_plot
-```
+![Dynamics of models parameterized to equivalent initial rates of growth of infectious individuals](2014-12-18-manuscript_files/figure-html/Fig4-1.png) 
 
 
-```{r Fig5, fig.cap="Dynamics of models parameterized to equivalent time to 10% infected individuals"}
-<<time_to_I10>>
-time_to_I10_comp_plot
-```
+![Dynamics of models parameterized to equivalent time to 10% infected individuals](2014-12-18-manuscript_files/figure-html/Fig5-1.png) 
 
 Patterns in the time-to-10%-infection parameterizations are
 similar to the matched-second-derivative parameterization. Mortality rates for
