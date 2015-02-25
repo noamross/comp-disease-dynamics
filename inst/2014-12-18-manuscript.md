@@ -79,12 +79,16 @@ Here I explore how the transient host-pathogen dynamics differ between *SI* and
 multi-infection systems. To compare models that with different structures and in
 which parameters have different interpretations, I fit the models to each other
 so that they have identical *dynamic behaviors* at different stages of an epidemic.
-I examine how *SI* and multi-infection models differ
-in long-term dynamics when parameterized to fit identical short-term conditions,
-and vice versa. I also explore how patterns of disease across life stages differ
-between over the course of epidemics in *SI* and multi-infection models.
-**State the exploration as a concrete question**
-**OPtional: give away the results**
+Using this approach, I ask, how do *SI* and multi-infection models that behave
+similarly at early stages of disease differ in long-term dynamics, and vice versa? 
+I also ask, how does model structure affect predictions of stage-specific behavior?
+I find that mortality rates increase over time multi-infection models, diverging
+from $SI$ models, and that these mortality rates diverge between host stages
+due to accumulation of infections, even when stage-specific parameters are identical.
+This suggests that the choice $SI$ or multi-infection as an appropriate framework to
+represent fungal disease long-term disease predictions and interpretation of
+stage-specific field data.
+
 
 Methods
 -------
@@ -240,14 +244,15 @@ Results
 
 
 
+
 ### Parameterizations
 
 For the equilibrium parameterization, the constant $c$, or the ratio of $\alpha$ and $\lambda$ values between
 the models, is the inverse of the mean number of infections at equilibrium
 in the $SIV$ and multi-infection models. This is 0.69 for
 the SIV model and 0.61 for the multi-infection model. For the
-acceleration-rate parameterization, $c$ was 0.99 for both $SIV$ and multi-infection
-models.  For the time-to-10% infection parameterization, $c$ was was 0.98 for both models.
+acceleration-rate parameterization, $c$ is 0.99 for both $SIV$ and multi-infection
+models.  For the time-to-10% infection parameterization, $c$ was is 0.98 for both models.
 Results for both accelleration and time-to-10% infection parameterizations were
 nearly identical (See Appendix), so I report only the equilibrium and time-to-10% results in
 the sections below.
@@ -256,8 +261,10 @@ the sections below.
 
 **Models with similar mortality rates at invasion or equilibrium diverage at 
 other times.**  Mortality rates of infected individuals in both the $SIV$ and 
-multi-infection models evolve over time while in the $SI$ model they are constant
-(Figure 1).
+multi-infection models evolve over time while they are constant the $SI$ model.
+(Figure 1). In all cases, $SIV$ and multi-infection mortality rates increase over
+time until equilibrium.  The increase in mortality is greater in the multi-infection
+model than the $SIV$ model, though the pattern is qualitatively similar. 
 
 ![Changes in mortality rates](2014-12-18-manuscript_files/figure-html/Fig2-1.png) 
 
