@@ -266,7 +266,7 @@ multi-infection models evolve over time while they are constant the $SI$ model.
 time until equilibrium.  The increase in mortality is greater in the multi-infection
 model than the $SIV$ model, though the pattern is qualitatively similar. 
 
-![Changes in mortality rates](2014-12-18-manuscript_files/figure-html/Fig2-1.png) 
+![Changes in mortality rates](2014-12-18-manuscript_files/figure-html/Fig2-1.svg) 
 
 
 ### Population effects
@@ -294,7 +294,7 @@ infected stage reaching a peak before equilibrium and the juvenile infected
 stage reaching a smaller equilibrium with no peak.
 
 
-![Dynamics of infection classes in the multi-infection model](2014-12-18-manuscript_files/figure-html/Fig3-1.png) 
+![Dynamics of infection classes in the multi-infection model](2014-12-18-manuscript_files/figure-html/Fig3-1.svg) 
 
 While equilibrium behaviors are identical and models start at the same initial
 conditions, transient behavior differs. The time to equilibrium is greater in
@@ -302,7 +302,7 @@ the multi-infection model than the $SIV$ model, and greater in both than the
 $SI$ model. It takes longer in the $SIV$ model, and longest in the
 multi-infection model, for the disease to emerge.
 
-![Host population dynamics](2014-12-18-manuscript_files/figure-html/Fig1-1.png) 
+![Host population dynamics](2014-12-18-manuscript_files/figure-html/Fig1-1.svg) 
 
 
 **Models with similar initial mortality rate reach different equilibrium mortality rates.**
@@ -327,10 +327,10 @@ model.
 
 
 
-![Dynamics of models parameterized to equivalent initial rates of growth of infectious individuals](2014-12-18-manuscript_files/figure-html/Fig4-1.png) 
+![Dynamics of models parameterized to equivalent initial rates of growth of infectious individuals](2014-12-18-manuscript_files/figure-html/Fig4-1.svg) 
 
 
-![Dynamics of models parameterized to equivalent time to 10% infected individuals](2014-12-18-manuscript_files/figure-html/Fig5-1.png) 
+![Dynamics of models parameterized to equivalent time to 10% infected individuals](2014-12-18-manuscript_files/figure-html/Fig5-1.svg) 
 
 Patterns in the time-to-10%-infection parameterizations are
 similar to the matched-second-derivative parameterization. Mortality rates for
