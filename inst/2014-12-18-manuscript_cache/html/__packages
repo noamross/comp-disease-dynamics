@@ -1,0 +1,15 @@
+base
+knitr
+deSolve
+plyr
+rootSolve
+reshape2
+ggplot2
+data.table
+noamtools
+numDeriv
+gridExtra
+magrittr
+extrafont
+R.cache
+dplyr

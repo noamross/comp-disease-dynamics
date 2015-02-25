@@ -43,7 +43,7 @@ df = data.frame(subset(multisf, time %in% times))
 df = subset(df, SizeClass != "Total" & Population > 1e-5)
 df = df[order(df$time),]
 df$time = factor(paste("Time =", df$time), levels = paste("Time =", unique(df$time)))
-progplot_SIV =ggplot(df, aes(x=Infected, y=Population, fill=SizeClass)) + 
+progplot_multi =ggplot(df, aes(x=Infected, y=Population, fill=SizeClass)) + 
   geom_area(position="identity", alpha = 0.5) +
   scale_fill_grey(labels = c("Juveniles", "Adults")) +
   theme_nr +
@@ -55,7 +55,7 @@ df2 = data.frame(subset(SIVsf, time %in% times))
 df2 = droplevels(subset(df2, SizeClass != "Total" & Population > 1e-5))
 df2 = df2[order(df2$time),]
 df2$time = factor(paste("Time =", df2$time), levels = paste("Time =", unique(df2$time)))
-progplot_multi = ggplot(df2, aes(x=as.factor(Infected), y=Population, fill=SizeClass)) + 
+progplot_SIV = ggplot(df2, aes(x=as.factor(Infected), y=Population, fill=SizeClass)) + 
   geom_bar(stat="identity", position="dodge", alpha = 0.5) +
   scale_fill_grey(labels = c("Juveniles", "Adults")) +
   scale_x_discrete(labels = c("S", "I", "V")) +
@@ -269,9 +269,9 @@ aa = optim(par = 1, fn = function(mod_SIV) {
   })
 
 
-mod_SIV = aa$par
-parms_SIVmod2$alpha = parms_SIV$alpha*mod_SIV
-parms_SIVmod2$lamda = parms_SIV$lamda*mod_SIV
+mod_SIV2 = aa$par
+parms_SIVmod2$alpha = parms_SIV$alpha*mod_SIV2
+parms_SIVmod2$lamda = parms_SIV$lamda*mod_SIV2
 out_SIVmod2 = run_sodp(parms_SIVmod2)
 SIVmod2sf = process_sodp(out_SIVmod2)
 SIVmod2sf = sodp_totals(SIVmod2sf)
@@ -290,10 +290,10 @@ bb = optim(par = aa$par, f = function(mod_multi) {
   return(sum(((val - SI_Final)/SI_Final)^2))
   })
 
-mod_multi = bb$par
+mod_multi2 = bb$par
 
-parms_multimod2$alpha = parms_multi$alpha*mod_multi
-parms_multimod2$lamda = parms_multi$lamda*mod_multi
+parms_multimod2$alpha = parms_multi$alpha*mod_multi2
+parms_multimod2$lamda = parms_multi$lamda*mod_multi2
 
 out_multimod2 = run_sodp(parms_multimod2)
 multimod2sf = process_sodp(out_multimod2)
@@ -409,9 +409,9 @@ cc = optim(par = 1, fn = function(mod_SIV) {
   }, method="Brent", lower=0, upper=2)
 
 
-mod_SIV = cc$par
-parms_SIVmod3$alpha = parms_SIV$alpha*mod_SIV
-parms_SIVmod3$lamda = parms_SIV$lamda*mod_SIV
+mod_SIV3 = cc$par
+parms_SIVmod3$alpha = parms_SIV$alpha*mod_SIV3
+parms_SIVmod3$lamda = parms_SIV$lamda*mod_SIV3
 parms_SIVmod3$times.max = 75
 parms_SIVmod3$times.by = 0.1
 out_SIVmod3 = run_sodp(parms_SIVmod3)
@@ -440,10 +440,10 @@ dd = optim(par = cc$par, f = function(mod_multi) {
   return(val)
   }, method="Brent", lower=0, upper=2)
 
-mod_multi = dd$par
+mod_multi3 = dd$par
 
-parms_multimod3$alpha = parms_multi$alpha*mod_multi
-parms_multimod3$lamda = parms_multi$lamda*mod_multi
+parms_multimod3$alpha = parms_multi$alpha*mod_multi3
+parms_multimod3$lamda = parms_multi$lamda*mod_multi3
 parms_multimod3$times.max = 75
 parms_multimod3$times.by = 0.1
 out_multimod3 = run_sodp(parms_multimod3)
@@ -553,9 +553,9 @@ ee = optim(par = c(1, 1), fn = function(mod_SIV) {
   })
 
 
-mod_SIV = ee$par
-parms_SIVmod4$alpha = parms_SIV$alpha*mod_SIV[1]
-parms_SIVmod4$lamda = parms_SIV$lamda*mod_SIV[2]
+mod_SIV4 = ee$par
+parms_SIVmod4$alpha = parms_SIV$alpha*mod_SIV4[1]
+parms_SIVmod4$lamda = parms_SIV$lamda*mod_SIV4[2]
 parms_SIVmod4$times.max = 75
 parms_SIVmod4$times.by = 0.1
 out_SIVmod4 = run_sodp(parms_SIVmod4)
@@ -587,10 +587,10 @@ ff = optim(par = ee$par, f = function(mod_multi) {
   return(val)
   })
 
-mod_multi = ff$par
+mod_multi4 = ff$par
 
-parms_multimod4$alpha = parms_multi$alpha*mod_multi[1]
-parms_multimod4$lamda = parms_multi$lamda*mod_multi[2]
+parms_multimod4$alpha = parms_multi$alpha*mod_multi4[1]
+parms_multimod4$lamda = parms_multi$lamda*mod_multi4[2]
 parms_multimod4$times.max = 75
 parms_multimod4$times.by = 0.1
 out_multimod4 = run_sodp(parms_multimod4)
@@ -698,9 +698,9 @@ gg = optim(par = c(1, 1), fn = function(mod_SIV) {
   })
 
 
-mod_SIV = gg$par
-parms_SIVmod5$alpha = parms_SIV$alpha*mod_SIV[1]
-parms_SIVmod5$lamda = parms_SIV$lamda*mod_SIV[2]
+mod_SIV5 = gg$par
+parms_SIVmod5$alpha = parms_SIV$alpha*mod_SIV5[1]
+parms_SIVmod5$lamda = parms_SIV$lamda*mod_SIV5[2]
 parms_SIVmod5$times.by = 0.1
 out_SIVmod5 = run_sodp(parms_SIVmod5)
 SIVmod5sf = process_sodp(out_SIVmod5)
@@ -730,10 +730,10 @@ hh = optim(par = gg$par, f = function(mod_multi) {
   return(val)
   })
 
-mod_multi = hh$par
+mod_multi5 = hh$par
 
-parms_multimod5$alpha = parms_multi$alpha*mod_multi[1]
-parms_multimod5$lamda = parms_multi$lamda*mod_multi[2]
+parms_multimod5$alpha = parms_multi$alpha*mod_multi5[1]
+parms_multimod5$lamda = parms_multi$lamda*mod_multi5[2]
 parms_multimod5$times.max = 75
 parms_multimod5$times.by = 0.1
 out_multimod5 = run_sodp(parms_multimod5)
@@ -808,6 +808,107 @@ time_to_I10eq_comp_plot = arrangeGrob(p1 + theme(legend.position="none"),
              widths=unit.c(plotwidth, plotwidth, plotwidth, lwidth),
              main = textGrob("Epidemic Dynamics: Equivalent time to 10% infection and equilibrium mortality", gp=gpar(fontsize=20,fontfamily='Lato')),
               nrow=1)
+
+## ----mortrateplot---------------------------------------------------
+
+library(dplyr)
+library(magrittr)
+stats_eq = ldply(list(SI=stats_SI.m, SIV=stats_SIVmod.m, multi=stats_multimod.m), function(x) x)
+stats_I10 = ldply(list(SI=stats_SI.m, SIV=stats_SIVmod3.m, multi=stats_multimod3.m), function(x) x)
+stats_eq %<>% mutate(parameterization = "Equivalent Equilibrium")
+stats_I10 %<>% mutate(parameterization = "Equivalent Time to 10% Infection")
+statsall = as.tbl(rbind(stats_eq, stats_I10))
+
+vardata = statsall %>% filter(variable == "MortInfRate", SizeClass == "Total")
+vardata$parameterization = factor(vardata$parameterization, levels= c("Equivalent Equilibrium", "Equivalent Time to 10% Infection"))
+mort_rate_comp_plot = ggplot(vardata, aes(x=time, y= value, linetype=.id)) +
+  geom_line(size=1.5) +
+  facet_wrap(~parameterization, nrow=1) +
+  scale_y_continuous(breaks=c(0,0.1,0.2, 0.3), limits=c(0.1,0.35)) +
+  ylab("Infected Mortality Rate (1/yr)") +
+  xlab("Time") +
+  scale_linetype_manual(labels=c("SI", "SIV", "Multi"), values=c(1,2,6)) +
+  scale_x_continuous(limits=c(0, 75), breaks=seq(0,75,25)) +
+  theme_nr +
+  theme(text=element_text(family="Lato"),
+        panel.background=element_rect(),
+        strip.background=element_blank(),
+        axis.text=element_text(color="black",size=15),
+        axis.title.y = element_text(vjust = 1),
+        axis.title.x = element_text(vjust = -1),
+        strip.text = element_text(size=22))
+
+## ----popplot---------------------------------------------------
+
+library(dplyr)
+library(magrittr)
+stats_eq = ldply(list(SI=stats_SI.m, SIV=stats_SIVmod.m, multi=stats_multimod.m), function(x) x)
+stats_I10 = ldply(list(SI=stats_SI.m, SIV=stats_SIVmod3.m, multi=stats_multimod3.m), function(x) x)
+stats_eq %<>% mutate(parameterization = "Equivalent Equilibrium")
+stats_I10 %<>% mutate(parameterization = "Equivalent Time to 10% Infection")
+statsall = as.tbl(rbind(stats_eq, stats_I10))
+
+vardata = statsall %>% filter(variable == "N", SizeClass == "Total")
+vardata$parameterization = factor(vardata$parameterization, levels= c("Equivalent Equilibrium", "Equivalent Time to 10% Infection"))
+population_comp_plot = ggplot(vardata, aes(x=time, y= value, linetype=.id)) +
+  geom_line(size=1.5) +
+  facet_wrap(~parameterization, nrow=1) +
+  ylim(0.75, 1) +
+  ylab("Host Population") +
+  xlab("Time") +
+  scale_linetype_manual(labels=c("SI", "SIV", "Multi"), values=c(1,2,6)) +
+  scale_x_continuous(limits=c(0, 75), breaks=seq(0,75,25)) +
+  theme_nr +
+  theme(text=element_text(family="Lato"),
+        panel.background=element_rect(),
+        strip.background=element_blank(),
+        axis.text=element_text(color="black",size=15),
+        axis.title.y = element_text(vjust = 1),
+        axis.title.x = element_text(vjust = -1),
+        strip.text = element_text(size=22))
+
+## ----mortrateage---------------------------------------------------
+
+library(dplyr)
+library(magrittr)
+stats_eq = ldply(list(SI=stats_SI.m, SIV=stats_SIVmod.m, multi=stats_multimod.m), function(x) x)
+stats_I10 = ldply(list(SI=stats_SI.m, SIV=stats_SIVmod3.m, multi=stats_multimod3.m), function(x) x)
+stats_eq %<>% mutate(parameterization = "Equivalent Equilibrium")
+stats_I10 %<>% mutate(parameterization = "Equivalent Time to 10% Infection")
+statsall = as.tbl(rbind(stats_eq, stats_I10))
+
+vardata = statsall %>% filter(variable == "MortInfRate", SizeClass != "Total")
+vardata$parameterization = factor(vardata$parameterization, levels= c("Equivalent Equilibrium", "Equivalent Time to 10% Infection"))
+vardata$.id = as.factor(vardata$.id)
+levels(vardata$.id) = c("SI", "SIV", "Multi")
+vardata = subset(vardata, .id !="SI")
+
+ann_text <- data.frame(time = 25,value = 0.2,lab = "Both stages in SI model",
+                       .id = factor("Multi"), parameterization =  "Equivalent Time to 10% Infection", 
+                       SizeClass=factor(2))
+
+mort_rate_age_comp_plot = ggplot(vardata) +
+  geom_segment(aes(x=0, xend=75, y=0.2, yend=0.2), size=1.5, col="grey") +
+  geom_text(data=ann_text, mapping = aes(x=time, y= value, label=lab), vjust=1.5, hjust=-0.4) +
+  geom_line(data=vardata, mapping = aes(x=time, y= value, linetype=.id, col=SizeClass), size=1.5) +
+  facet_grid(.id~parameterization) +
+  ylab("Mortality Rate (1/yr)") +
+  xlab("Time") +
+  scale_y_continuous(breaks=c(0,0.1,0.2, 0.3), limits=c(0.1,0.35)) +
+  scale_linetype_manual(labels=c("SIV", "Multi"), values=c(2,6)) +
+  guides(col = guide_legend(reverse=TRUE)) +
+  scale_x_continuous(limits=c(0, 75), breaks=seq(0,75,25)) +
+  scale_color_manual(labels = c("Juvenile", "Adult", "Both (SI model)"),
+                     values = c("#2075B2", "#D72526", "grey")) +
+  theme_nr +
+  theme(text=element_text(family="Lato"),
+        panel.background=element_rect(),
+        strip.background=element_blank(),
+        axis.text=element_text(color="black",size=15),
+        axis.title.y = element_text(vjust = 1),
+        axis.title.x = element_text(vjust = -1),
+        strip.text = element_text(size=22))
+
 
 #' 
 #' Currently matching model by equilibrium mortality.  Next, match the models by
